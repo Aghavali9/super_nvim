@@ -1,0 +1,24 @@
+# Neovim
+plugin/packer_compiled.lua
+*.swp
+*.swo
+*~
+
+# Plugin managers
+lazy-lock.json
+.repro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+.luarc.json
