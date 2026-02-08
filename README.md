@@ -171,7 +171,21 @@ npm install -g lua-language-server
 
 ## 📝 Committing Your Changes
 
-This repository is set up for easy version control of your personal configuration:
+This repository is set up for easy version control of your personal configuration.
+
+### Option 1: Use the Quick Commit Script (Easiest)
+
+```bash
+cd ~/.config/nvim
+./commit.sh
+```
+
+The script will guide you through:
+- Viewing changes
+- Writing a commit message
+- Committing and pushing your changes
+
+### Option 2: Manual Git Commands
 
 ```bash
 # Navigate to your config directory
@@ -186,9 +200,13 @@ git add .
 # Commit your changes
 git commit -m "Update configuration"
 
-# Push to your fork
+# Push to your repository
 git push origin main
 ```
+
+### Need Help with Git?
+
+See `GIT_GUIDE.md` for a comprehensive guide to Git commands and workflows!
 
 ## 🤝 Contributing
 
