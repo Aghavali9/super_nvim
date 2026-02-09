@@ -14,3 +14,29 @@ This script handles dependencies, installs the latest stable Neovim, and sets up
 
 ```bash
 bash <(curl -s [https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh](https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh))
+## 🏁 Post-Installation & First Run
+
+After the script finishes, follow these steps to complete the setup:
+
+1.  **Launch Neovim:**
+    Open your terminal and type:
+    ```bash
+    nvim
+    ```
+
+2.  **Wait for Plugins:**
+    On the first launch, your package manager (Lazy.nvim / Packer) will automatically open a window and start downloading plugins.
+    * **Do not close Neovim** until this process finishes.
+    * You may see some errors initially—this is normal. They will resolve once the installation completes.
+
+3.  **Restart:**
+    Once the download is complete, close Neovim (`:q`) and reopen it.
+
+4.  **Install a Nerd Font (Crucial):**
+    If you see question marks `?` or weird squares `[]` in the UI, your terminal is missing a patched font.
+    * **Download:** [JetBrains Mono Nerd Font](https://www.nerdfonts.com/font-downloads) (Recommended)
+    * **Install:** Unzip and install the font on your OS.
+    * **Configure:** Set your terminal emulator (Alacritty, iTerm2, Windows Terminal, etc.) to use "JetBrainsMono Nerd Font".
+
+5.  **Language Servers (Optional):**
+    If you use Mason, type `:Mason` to see which language servers are installed. You can install new ones by pressing `i` on the desired server.
