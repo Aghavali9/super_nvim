@@ -14,6 +14,8 @@ This script handles dependencies, installs the latest stable Neovim, and sets up
 
 ```bash
 bash <(curl -s [https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh](https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh))
+```
+
 ## 🏁 Post-Installation & First Run
 
 After the script finishes, follow these steps to complete the setup:
