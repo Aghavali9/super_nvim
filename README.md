@@ -27,8 +27,15 @@ A powerful, modern Neovim configuration optimized for multi-language development
 
 ### Automated Installation (Ubuntu/Debian)
 
+**⚠️ Security Note**: Always inspect scripts before running them!
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh | bash
+# Download and inspect the script first
+curl -fsSL https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh -o nvim_installer.sh
+cat nvim_installer.sh  # Review the script
+
+# If everything looks good, run it
+bash nvim_installer.sh
 ```
 
 ### Manual Installation
