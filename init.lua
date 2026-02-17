@@ -1,5 +1,5 @@
 -- =============================================================================
---  NEOVIM v0.11+ CONFIGURATION (Cleaned & Fixed)
+--  NEOVIM v0.11+ CONFIGURATION (Fixed for Deprecation Warning)
 -- =============================================================================
 
 -- 1. EDITOR OPTIONS
@@ -10,7 +10,9 @@ vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
+vim.opt.scrolloff = 8           -- Keep 8 lines of context when scrolling
 vim.opt.termguicolors = true
+vim.opt.clipboard = "unnamedplus" -- Sync with system clipboard
 
 -- 2. PLUGIN MANAGER (PACKER)
 local ensure_packer = function()
@@ -33,45 +35,81 @@ require('packer').startup(function(use)
   use 'nvim-treesitter/nvim-treesitter'
   use 'nvim-lualine/lualine.nvim'
   use 'lewis6991/gitsigns.nvim'
-  use 'dracula/vim'
+  
+  -- The "Primeagen" Suite
+  use 'theprimeagen/harpoon'
+  use 'mbbill/undotree'
+  use 'tpope/vim-fugitive'
+
+  -- Colorscheme (Rose-Pine)
+  use({ 'rose-pine/neovim', as = 'rose-pine' })
+
+  -- Fuzzy Finder (Telescope)
+  use {
+    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+    requires = { {'nvim-lua/plenary.nvim'} }
+  }
+
+  -- Multi-Language Support
+  use 'neovim/nvim-lspconfig'
+
+  -- Markdown Tools
+  use({
+      "iamcco/markdown-preview.nvim",
+      run = function() vim.fn["mkdp#util#install"]() end,
+  })
+  use 'MeanderingProgrammer/render-markdown.nvim' -- Obsidian style in-editor
+
+  -- Dashboard (Startup Menu)
+  use {
+      'goolord/alpha-nvim',
+      requires = { 'nvim-tree/nvim-web-devicons' },
+      config = function ()
+          require'alpha'.setup(require'alpha.themes.dashboard'.config)
+      end
+  }
 end)
 
--- 3. COLORSCHEME
-vim.cmd.colorscheme("dracula")
+-- 3. COLORSCHEME SETUP
+local status, _ = pcall(vim.cmd, "colorscheme rose-pine")
+if not status then
+  print("Colorscheme not found! Run :PackerSync")
+  vim.cmd.colorscheme("default")
+end
 
 -- 4. GENERAL PLUGINS SETUP
 require('mason').setup()
 require('nvim-treesitter.configs').setup {
-  ensure_installed = { 'c', 'cpp', 'lua' },
+  ensure_installed = { 'c', 'cpp', 'lua', 'python', 'markdown' },
   highlight = { enable = true },
   indent = { enable = true },
 }
-require('lualine').setup({ options = { theme = 'dracula' } })
+require('lualine').setup({ options = { theme = 'rose-pine' } })
 require('gitsigns').setup()
+require('render-markdown').setup()
 
 -- =============================================================================
---  C/C++ LSP SETUP (The Important Part)
+--  5. MULTI-LANGUAGE INTELLIGENCE (LSP) - THE FIX
 -- =============================================================================
 
--- A. Prepare "Capabilities" so Autocomplete works with the Server
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+-- A. Prepare Capabilities (for Autocomplete)
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- B. Start the Server (Native NeoVim 0.11 Method)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "c", "cpp", "objc", "objcpp" },
-  callback = function()
-    vim.lsp.start({
-      name = "clangd",
-      cmd = { "clangd" }, -- This works because we confirmed clangd is in your path
-      capabilities = capabilities,
-      root_dir = vim.fs.root(0, {".git", "Makefile", ".clang-format"}),
-    })
-  end,
-})
+-- B. Define & Enable Servers (The New Neovim 0.11 Way)
+-- Add any new languages here (e.g., 'rust_analyzer')
+local servers = { 'clangd', 'pyright', 'lua_ls' }
 
--- C. Set Keymaps ONLY when the Server Attaches
--- (This replaces your old "on_attach" function)
+for _, server in ipairs(servers) do
+    -- 1. Set the config
+    vim.lsp.config[server] = {
+        capabilities = capabilities,
+    }
+    -- 2. Enable the server
+    vim.lsp.enable(server)
+end
+
+-- C. Global Keymaps & Settings (LspAttach)
+-- This automatically runs whenever ANY LSP connects to a buffer
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local client = vim.lsp.get_client_by_id(args.data.client_id)
@@ -79,26 +117,27 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
     -- Navigation
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
     vim.keymap.set('n', 'K',  vim.lsp.buf.hover, opts)
-
+    
     -- Actions
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-    
+    vim.keymap.set('n', '<leader>fd', require('telescope.builtin').diagnostics, opts)
+
     -- Format on Save
     if client.supports_method("textDocument/formatting") then
       vim.api.nvim_create_autocmd("BufWritePre", {
         buffer = args.buf,
-        callback = function() vim.lsp.buf.format({ bufnr = args.buf, id = client.id }) end,
+        callback = function() 
+            vim.lsp.buf.format({ bufnr = args.buf, id = client.id }) 
+        end,
       })
     end
   end,
 })
 
--- 5. AUTOCOMPLETE SETUP (nvim-cmp)
+-- 6. AUTOCOMPLETE SETUP (nvim-cmp)
 local cmp = require'cmp'
 cmp.setup({
   mapping = cmp.mapping.preset.insert({
@@ -113,30 +152,107 @@ cmp.setup({
   }),
 })
 
--- 6. GENERAL KEYMAPS
+-- =============================================================================
+--  7. GENERAL KEYMAPS ("The Pro Setup")
+-- =============================================================================
+
+-- Standard Operations
 vim.keymap.set('n', '<leader>e', ':Ex<CR>')
 vim.keymap.set('n', '<leader>w', ':w<CR>')
 vim.keymap.set('n', '<leader>q', ':q<CR>')
 
--- Compile and Run C/C++ in a Horizontal Split (Bottom)
+-- 1. Centered Scrolling
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+
+-- 2. Fast Window Navigation
+vim.keymap.set("n", "<C-h>", "<C-w>h")
+vim.keymap.set("n", "<C-j>", "<C-w>j")
+vim.keymap.set("n", "<C-k>", "<C-w>k")
+vim.keymap.set("n", "<C-l>", "<C-w>l")
+vim.keymap.set("n", "<C-Left>", "<C-w>h")
+vim.keymap.set("n", "<C-Down>", "<C-w>j")
+vim.keymap.set("n", "<C-Up>", "<C-w>k")
+vim.keymap.set("n", "<C-Right>", "<C-w>l")
+
+-- 3. Visual Mode: Move Selected Blocks
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+-- 4. Paste without losing clipboard
+vim.keymap.set("x", "<leader>p", [["_dP]])
+
+-- 5. Search & Replace
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+
+-- 6. Compile and Run C/C++ in Horizontal Split (Bottom)
 vim.keymap.set('n', '<leader>r', function()
-  -- 1. Get file details
   local file = vim.fn.expand('%')
   local output = vim.fn.expand('%:r')
-
-  -- 2. Check if valid C/C++ file
   if file == "" or (vim.fn.expand('%:e') ~= "c" and vim.fn.expand('%:e') ~= "cpp") then
     print("Not a C/C++ file!")
     return
   end
-
-  -- 3. Save if modified
   if vim.bo.modifiable and not vim.bo.readonly and vim.bo.modified then
     vim.cmd('w')
   end
-
-  -- 4. Run in a Horizontal Split (Below)
-  -- 'belowright split' forces the new window to appear under the current one
-  -- We also added 'resize 12' to keep the terminal height manageable (optional)
   vim.cmd('belowright split | resize 12 | terminal gcc ' .. file .. ' -o ' .. output .. ' && ./' .. output)
-end, { desc = 'Run C code in horizontal split' })
+end)
+
+-- 7. Markdown Preview
+vim.keymap.set('n', '<leader>mp', ':MarkdownPreview<CR>')
+
+-- =============================================================================
+--  8. TELESCOPE & HARPOON & UNDOTREE
+-- =============================================================================
+local builtin = require('telescope.builtin')
+local mark = require("harpoon.mark")
+local ui = require("harpoon.ui")
+
+-- Telescope
+vim.keymap.set('n', '<leader>ff', builtin.find_files)
+vim.keymap.set('n', '<leader>fg', builtin.live_grep)
+vim.keymap.set('n', '<leader>fb', builtin.buffers)
+
+-- Harpoon
+vim.keymap.set("n", "<leader>a", mark.add_file)
+vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
+vim.keymap.set("n", "<leader>1", function() ui.nav_file(1) end)
+vim.keymap.set("n", "<leader>2", function() ui.nav_file(2) end)
+vim.keymap.set("n", "<leader>3", function() ui.nav_file(3) end)
+vim.keymap.set("n", "<leader>4", function() ui.nav_file(4) end)
+
+-- Undotree / Git
+vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
+
+-- =============================================================================
+--  9. DASHBOARD (Alpha - BAT VIM Edition)
+-- =============================================================================
+local alpha = require("alpha")
+local dashboard = require("alpha.themes.dashboard")
+
+-- Set the Header
+dashboard.section.header.val = {
+    [[                                                   ]],
+    [[  ____    _  _____     __     _____ __  __       ]],
+    [[ | __ )  / \|_   _|    \ \   / /_ _|  \/  |      ]],
+    [[ |  _ \ / _ \ | | ____  \ \ / / | || |\/| |      ]],
+    [[ | |_) / ___ \| ||____|  \ V /  | || |  | |      ]],
+    [[ |____/_/   \_\_|         \_/  |___|_|  |_|      ]],
+    [[                                                   ]],
+}
+
+-- Set the Buttons
+dashboard.section.buttons.val = {
+    dashboard.button("e", "  New File", ":ene <BAR> startinsert <CR>"),
+    dashboard.button("f", "  Find File", ":Telescope find_files<CR>"),
+    dashboard.button("r", "  Recent Files", ":Telescope oldfiles<CR>"),
+    dashboard.button("t", "  Find Text", ":Telescope live_grep<CR>"),
+    dashboard.button("c", "  Configuration", ":e $MYVIMRC <CR>"),
+    dashboard.button("q", "  Quit", ":qa<CR>"),
+}
+
+alpha.setup(dashboard.config)
