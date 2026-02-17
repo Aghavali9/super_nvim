@@ -267,11 +267,6 @@ Feel free to fork this configuration and customize it to your needs. If you find
 
 This configuration is free to use and modify.
 
-## 👤 Author
-
-**Mammad (Mr. Wayne)**
-- GitHub: [@Aghavali9](https://github.com/Aghavali9)
-
 ## 🌟 Credits
 
 Inspired by:
