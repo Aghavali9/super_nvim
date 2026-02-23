@@ -36,3 +36,28 @@ ls.add_snippets("c", {
     }),
 
 })
+
+-- ==========================================
+-- 2. CMake Snippets
+-- ==========================================
+ls.add_snippets("cmake", {
+
+    -- Standard CMake Boilerplate for C Projects
+    s("cmakeboiler", {
+        t("cmake_minimum_required(VERSION "), i(1, "3.10"), t({")", "", ""}),
+        t("project("), i(2, "MyProject"), t({" C)", ""}),
+        t({
+            "set(CMAKE_C_STANDARD 11)",
+            "set(CMAKE_C_STANDARD_REQUIRED True)",
+            "",
+            "add_compile_options(-Wall -Wextra -g)",
+            "",
+            "add_executable("
+        }),
+        rep(2), -- Automatically names the executable after your project name
+        t(" "),
+        i(3, "main.c"),
+        t(")")
+    }),
+
+})
