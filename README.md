@@ -31,11 +31,11 @@ A powerful, modern Neovim configuration optimized for multi-language development
 
 ```bash
 # Download and inspect the script first
-curl -fsSL https://raw.githubusercontent.com/Aghavali9/super_nvim/main/nvim_installer.sh -o nvim_installer.sh
-cat nvim_installer.sh  # Review the script
+curl -fsSL https://raw.githubusercontent.com/Aghavali9/super_nvim/main/installer.sh -o installer.sh
+cat installer.sh  # Review the script
 
 # If everything looks good, run it
-bash nvim_installer.sh
+bash installer.sh
 ```
 
 ### Manual Installation
@@ -60,7 +60,7 @@ bash nvim_installer.sh
    ```bash
    nvim
    ```
-   Packer will automatically install all plugins on first launch.
+   lazy.nvim will automatically install all plugins on first launch.
 
 5. **Install language servers** (inside Neovim):
    ```vim
@@ -71,7 +71,7 @@ bash nvim_installer.sh
 ## 📦 Included Plugins
 
 ### Core Functionality
-- **[packer.nvim](https://github.com/wbthomason/packer.nvim)** - Plugin manager
+- **[lazy.nvim](https://github.com/folke/lazy.nvim)** - Plugin manager
 - **[mason.nvim](https://github.com/williamboman/mason.nvim)** - LSP server installer
 - **[nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)** - LSP configuration
 
@@ -216,20 +216,19 @@ vim.cmd("colorscheme rose-pine")
 The dashboard header can be customized in section 9 of `init.lua`.
 
 ### Adding Plugins
-Add plugins in the packer startup block:
+Add plugins in the lazy.nvim setup block:
 ```lua
-require('packer').startup(function(use)
-  use 'author/plugin-name'
-end)
+require('lazy').setup({
+  { 'author/plugin-name' },
+})
 ```
-Then run `:PackerSync` in Neovim.
+Then run `:Lazy sync` in Neovim.
 
 ## 🐛 Troubleshooting
 
 ### Plugins not loading
 ```vim
-:PackerSync
-:PackerCompile
+:Lazy sync
 ```
 
 ### LSP not working
@@ -253,9 +252,7 @@ Then run `:PackerSync` in Neovim.
 ```
 ~/.config/nvim/
 ├── init.lua              # Main configuration file
-├── nvim_installer.sh     # Automated installation script
-├── plugin/               # Plugin cache
-│   └── packer_compiled.lua
+├── installer.sh          # Automated installation script
 └── README.md            # This file
 ```
 
