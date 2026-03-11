@@ -28,46 +28,46 @@ vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git (fugitive)" })
 
 -- Smart Build & Run (<leader>r) — handles C/C++, Python, and Java
 vim.keymap.set("n", "<leader>r", function()
-  if vim.bo.modified then vim.cmd("w") end
+	if vim.bo.modified then
+		vim.cmd("w")
+	end
 
-  local ft = vim.bo.filetype
-  local cmd = ""
+	local ft = vim.bo.filetype
+	local cmd = ""
 
-  if ft == "c" or ft == "cpp" then
-    if vim.fn.filereadable("CMakeLists.txt") == 1 then
-      cmd = "cmake -S . -B build && cmake --build build && ./build/$(grep -m 1 'project(' CMakeLists.txt | sed 's/project(//;s/ .*//')"
-    else
-      local file = vim.fn.expand("%")
-      local ext = vim.fn.expand("%:e")
-      if file == "" or (ext ~= "c" and ext ~= "cpp") then
-        print("Not a valid C/C++ file")
-        return
-      end
-      local compiler = ext == "cpp" and "g++" or "gcc"
-      cmd = compiler .. " " .. file .. " -o " .. vim.fn.expand("%:r") .. " && ./" .. vim.fn.expand("%:r")
-    end
+	if ft == "c" or ft == "cpp" then
+		if vim.fn.filereadable("CMakeLists.txt") == 1 then
+			cmd =
+				"cmake -S . -B build && cmake --build build && ./build/$(grep -m 1 'project(' CMakeLists.txt | sed 's/project(//;s/ .*//')"
+		else
+			local file = vim.fn.expand("%")
+			local ext = vim.fn.expand("%:e")
+			if file == "" or (ext ~= "c" and ext ~= "cpp") then
+				print("Not a valid C/C++ file")
+				return
+			end
+			local compiler = ext == "cpp" and "g++" or "gcc"
+			cmd = compiler .. " " .. file .. " -o " .. vim.fn.expand("%:r") .. " && ./" .. vim.fn.expand("%:r")
+		end
+	elseif ft == "python" then
+		if vim.fn.filereadable("pyproject.toml") == 1 or vim.fn.filereadable("setup.py") == 1 then
+			cmd = "PYTHONPATH=src python3 " .. vim.fn.expand("%")
+		else
+			cmd = "python3 " .. vim.fn.expand("%")
+		end
+	elseif ft == "java" then
+		if vim.fn.filereadable("pom.xml") == 1 then
+			cmd = "mvn -q compile exec:java -Dexec.mainClass=com.example.Main"
+		elseif vim.fn.filereadable("build.gradle") == 1 then
+			cmd = "gradle run"
+		else
+			local file = vim.fn.expand("%")
+			cmd = "javac " .. file .. " && java " .. vim.fn.expand("%:t:r")
+		end
+	else
+		print("No runner configured for filetype: " .. ft)
+		return
+	end
 
-  elseif ft == "python" then
-    if vim.fn.filereadable("pyproject.toml") == 1 or vim.fn.filereadable("setup.py") == 1 then
-      cmd = "python3 -m " .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
-    else
-      cmd = "python3 " .. vim.fn.expand("%")
-    end
-
-  elseif ft == "java" then
-    if vim.fn.filereadable("pom.xml") == 1 then
-      cmd = "mvn -q compile exec:java -Dexec.mainClass=com.example.Main"
-    elseif vim.fn.filereadable("build.gradle") == 1 then
-      cmd = "gradle run"
-    else
-      local file = vim.fn.expand("%")
-      cmd = "javac " .. file .. " && java " .. vim.fn.expand("%:t:r")
-    end
-
-  else
-    print("No runner configured for filetype: " .. ft)
-    return
-  end
-
-  vim.cmd("belowright split | resize 12 | terminal " .. cmd)
+	vim.cmd("belowright split | resize 12 | terminal " .. cmd)
 end, { desc = "Smart Build & Run" })
