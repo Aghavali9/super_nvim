@@ -201,4 +201,11 @@ return {
 		event = "VeryLazy",
 		config = true,
 	},
+
+	-- ── UI enhancements ───────────────────────────────────────────────────────
+	{
+		"stevearc/dressing.nvim",
+		event = "VeryLazy",
+		config = true,
+	},
 }

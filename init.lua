@@ -33,3 +33,4 @@ require("lazy").setup("plugins", {
 require("config.keymaps")
 require("config.autocmds")
 require("config.scaffolding")
+require("config.snippets")

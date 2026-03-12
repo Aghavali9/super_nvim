@@ -10,7 +10,7 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **Fuzzy Finding**: Lightning-fast file/text search with Telescope
 - **Git Integration**: Built-in git tools (Fugitive, Gitsigns)
 - **Project Navigation**: Quick file switching with Harpoon
-- **Markdown Support**: Live preview and beautiful in-editor rendering
+- **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation (`<leader>mt`), table auto-alignment (`<leader>ma`), and LuaSnip table snippets (`tbl2x2`, `tbl3x2`, `tbl3x3`)
 - **Beautiful UI**: Rose-Pine colorscheme with custom dashboard
 - **Pro Keybindings**: Optimized keyboard shortcuts for efficient editing
 
@@ -95,6 +95,7 @@ bash installer.sh
 - **[rose-pine](https://github.com/rose-pine/neovim)** - Beautiful colorscheme
 - **[lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** - Statusline
 - **[alpha-nvim](https://github.com/goolord/alpha-nvim)** - Custom dashboard
+- **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI for all `vim.ui` prompts
 
 ### Markdown
 - **[markdown-preview.nvim](https://github.com/iamcco/markdown-preview.nvim)** - Live browser preview
@@ -169,9 +170,22 @@ The leader key is set to `<Space>`.
 | `<leader>r` | Compile and run current C/C++ file |
 
 ### Markdown
+
+> **Note**: Markdown keybinds are buffer-local — they are only active in `.md` files.
+
 | Key | Action |
 |-----|--------|
 | `<leader>mp` | Open markdown preview in browser |
+| `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
+| `<leader>ma` | Auto-align/reformat markdown table under cursor |
+
+#### LuaSnip Table Snippets (markdown files only)
+| Trigger | Description |
+|---------|-------------|
+| `tbl2x2` | 2-column, 2-row table with tab stops in each cell |
+| `tbl3x2` | 3-column, 2-row table with tab stops in each cell |
+| `tbl3x3` | 3-column, 3-row table with tab stops in each cell |
+| `tbl` | Quick 2-column, 1-row starter table |
 
 ### Autocompletion
 | Key | Action |
@@ -251,9 +265,18 @@ Then run `:Lazy sync` in Neovim.
 
 ```
 ~/.config/nvim/
-├── init.lua              # Main configuration file
-├── installer.sh          # Automated installation script
-└── README.md            # This file
+├── init.lua                    # Main configuration file
+├── installer.sh                # Automated installation script
+├── README.md                   # This file
+├── ftplugin/
+│   └── markdown.lua            # Buffer-local markdown keymaps (mp, mt, ma)
+└── lua/
+    ├── config/
+    │   ├── keymaps.lua         # Global keybindings
+    │   ├── snippets.lua        # LuaSnip markdown table snippets
+    │   └── ...                 # Other config modules
+    └── plugins/
+        └── init.lua            # Plugin specifications
 ```
 
 ## 🤝 Contributing
