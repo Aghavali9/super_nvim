@@ -172,6 +172,7 @@ The leader key is set to `<Space>`.
 | Key | Action |
 |-----|--------|
 | `<leader>mp` | Open markdown preview in browser |
+| `<leader>mt` | Generate markdown table (interactive) |
 
 ### Autocompletion
 | Key | Action |

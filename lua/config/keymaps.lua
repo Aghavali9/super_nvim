@@ -23,6 +23,79 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><
 
 vim.keymap.set("n", "<leader>mp", ":MarkdownPreview<CR>", { desc = "Markdown preview" })
 
+vim.keymap.set("n", "<leader>mt", function()
+	if vim.bo.filetype ~= "markdown" then
+		vim.notify("Markdown table generator only works in markdown files", vim.log.levels.WARN)
+		return
+	end
+
+	vim.ui.input({ prompt = "Number of columns: " }, function(cols_input)
+		if not cols_input then
+			return
+		end
+		local cols = tonumber(cols_input)
+		if not cols or cols <= 0 then
+			vim.notify("Invalid number of columns", vim.log.levels.WARN)
+			return
+		end
+		cols = math.floor(cols)
+
+		vim.ui.input({ prompt = "Number of rows (data rows): " }, function(rows_input)
+			if not rows_input then
+				return
+			end
+			local rows = tonumber(rows_input)
+			if not rows or rows <= 0 then
+				vim.notify("Invalid number of rows", vim.log.levels.WARN)
+				return
+			end
+			rows = math.floor(rows)
+
+			-- Pre-compute column widths (header text + 2 spaces padding)
+			local widths = {}
+			for i = 1, cols do
+				widths[i] = #("Header " .. i) + 2
+			end
+
+			-- Build header row
+			local header_cells = {}
+			for i = 1, cols do
+				table.insert(header_cells, " Header " .. i .. " ")
+			end
+			local header = "|" .. table.concat(header_cells, "|") .. "|"
+
+			-- Build separator row
+			local sep_cells = {}
+			for i = 1, cols do
+				table.insert(sep_cells, string.rep("-", widths[i]))
+			end
+			local separator = "|" .. table.concat(sep_cells, "|") .. "|"
+
+			-- Build data rows (pad "Cell" to match each column's width)
+			local data_lines = {}
+			for _ = 1, rows do
+				local row_cells = {}
+				for i = 1, cols do
+					local cell = " Cell"
+					cell = cell .. string.rep(" ", widths[i] - #cell)
+					table.insert(row_cells, cell)
+				end
+				table.insert(data_lines, "|" .. table.concat(row_cells, "|") .. "|")
+			end
+
+			-- Assemble table lines
+			local table_lines = { header, separator }
+			for _, line in ipairs(data_lines) do
+				table.insert(table_lines, line)
+			end
+
+			-- Insert below current cursor line
+			local row = vim.api.nvim_win_get_cursor(0)[1]
+			vim.api.nvim_buf_set_lines(0, row, row, false, table_lines)
+		end)
+	end)
+end, { desc = "Markdown table generator" })
+
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { desc = "Undotree" })
 vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git (fugitive)" })
 
