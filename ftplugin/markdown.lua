@@ -44,9 +44,9 @@ vim.keymap.set("n", "<leader>mt", function()
         for _ = 1, rows do
             local row_cells = {}
             for c = 1, cols do
-                -- Pad "Cell" to same width as corresponding header cell
+                -- Pad to same width as corresponding header cell
                 local content_width = #header_cells[c]
-                local cell_text = " Cell"
+                local cell_text = " "
                 local padding = math.max(0, content_width - #cell_text)
                 table.insert(row_cells, cell_text .. string.rep(" ", padding))
             end
