@@ -236,10 +236,10 @@ The leader key is set to `<Space>`.
 |-----|--------|
 | `<leader>pt` | Run pytest (project or current file) |
 | `<leader>pv` | Create / activate `.venv` virtual environment |
-| `<leader>pd` | Insert Google-style docstring skeleton |
-| `<leader>pm` | Insert `if __name__ == "__main__":` block |
-| `<leader>pc` | Insert class skeleton (interactive) |
-| `<leader>pf` | Insert function skeleton (interactive) |
+| `<leader>md` | Insert Google-style docstring skeleton |
+| `<leader>mm` | Insert `if __name__ == "__main__":` block |
+| `<leader>mc` | Insert class skeleton (interactive) |
+| `<leader>mf` | Insert function skeleton (interactive) |
 
 #### LuaSnip Snippets — Python
 | Trigger | Description |
@@ -353,6 +353,18 @@ The leader key is set to `<Space>`.
 
 ---
 
+### Project Scaffolding
+
+> **Note**: These commands scaffold a new project in the current working directory.
+
+| Command | Description |
+|---------|-------------|
+| `:CProject [name]` | Scaffolds a new C/C++ project with CMake (`CMakeLists.txt`, `src/main.c`, `include/`, `.gitignore`) |
+| `:PyProject [name]` | Scaffolds a new Python project with `pyproject.toml`, `src/<name>/`, `tests/`, and `.gitignore` |
+| `:JavaProject [name]` | Scaffolds a new Java/Maven project with `pom.xml`, standard `src/main/java/` layout, and `.gitignore` |
+
+---
+
 ### Autocompletion
 | Key | Action |
 |-----|--------|
@@ -436,7 +448,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 ├── README.md                   # This file
 ├── ftplugin/
 │   ├── markdown.lua            # Buffer-local Markdown keymaps (mp, mt, ma)
-│   ├── python.lua              # Buffer-local Python code-generation (pd, pm, pc, pf, pt, pv)
+│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, pt, pv)
 │   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
 │   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
 │   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
