@@ -1,6 +1,14 @@
 -- ftplugin/python.lua
 -- Buffer-local keymaps and code-generation helpers for Python files
 
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>m", group = "Python", buffer = true },
+    })
+end
+
 -- ── Run & Test ───────────────────────────────────────────────────────────────
 
 -- <leader>mt — run pytest for the project (or the current file as fallback)

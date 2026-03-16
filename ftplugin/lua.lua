@@ -1,6 +1,14 @@
 -- ftplugin/lua.lua
 -- Buffer-local keymaps for Lua files
 
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>l", group = "Lua", buffer = true },
+    })
+end
+
 -- <leader>lr — source (reload) the current Lua file inside Neovim
 vim.keymap.set("n", "<leader>lr", function()
     vim.cmd("luafile %")

@@ -1,6 +1,14 @@
 -- ftplugin/java.lua
 -- Buffer-local keymaps and code-generation helpers for Java files
 
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>j", group = "Java", buffer = true },
+    })
+end
+
 -- <leader>jc — insert a class skeleton (interactive)
 vim.keymap.set("n", "<leader>jc", function()
     vim.ui.input({ prompt = "Class name: " }, function(name)

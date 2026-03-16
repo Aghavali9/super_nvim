@@ -1,6 +1,14 @@
 -- ftplugin/markdown.lua
 -- Buffer-local keymaps for markdown files (loaded automatically by Neovim for *.md)
 
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>d", group = "Markdown", buffer = true },
+    })
+end
+
 vim.keymap.set("n", "<leader>dp", ":MarkdownPreview<CR>", { buffer = true, desc = "Markdown preview" })
 
 -- <leader>dt — interactive markdown table generator (single CxR prompt)

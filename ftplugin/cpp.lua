@@ -1,6 +1,14 @@
 -- ftplugin/cpp.lua
 -- Buffer-local keymaps and code-generation helpers for C++ files
 
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>c", group = "C++", buffer = true },
+    })
+end
+
 -- <leader>ch — insert (or update) an include-guard for the current header file
 vim.keymap.set("n", "<leader>ch", function()
     local fname = vim.fn.expand("%:t"):upper():gsub("[%.%-%s]", "_")
