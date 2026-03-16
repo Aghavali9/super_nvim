@@ -5,32 +5,32 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
     wk.add({
-        { "<leader>l", group = "Lua", buffer = true },
+        { "<leader>m", group = "Lua", buffer = true },
     })
 end
 
--- <leader>lr — source (reload) the current Lua file inside Neovim
-vim.keymap.set("n", "<leader>lr", function()
+-- <leader>mr — source (reload) the current Lua file inside Neovim
+vim.keymap.set("n", "<leader>mr", function()
     vim.cmd("luafile %")
     vim.notify("Sourced: " .. vim.fn.expand("%:t"), vim.log.levels.INFO)
 end, { buffer = true, desc = "Lua: source current file" })
 
--- <leader>lx — execute the current line as a Lua expression and echo result
-vim.keymap.set("n", "<leader>lx", function()
+-- <leader>mx — execute the current line as a Lua expression and echo result
+vim.keymap.set("n", "<leader>mx", function()
     local line = vim.api.nvim_get_current_line()
-    local ok, result = pcall(load("return " .. line))
-    if ok then
+    local ok2, result = pcall(load("return " .. line))
+    if ok2 then
         vim.notify(tostring(result), vim.log.levels.INFO)
     else
-        local ok2, err = pcall(load(line))
-        if not ok2 then
+        local ok3, err = pcall(load(line))
+        if not ok3 then
             vim.notify(tostring(err), vim.log.levels.ERROR)
         end
     end
 end, { buffer = true, desc = "Lua: execute current line" })
 
--- <leader>lf — insert a function skeleton (interactive)
-vim.keymap.set("n", "<leader>lf", function()
+-- <leader>mf — insert a function skeleton (interactive)
+vim.keymap.set("n", "<leader>mf", function()
     vim.ui.input({ prompt = "Function name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -45,8 +45,8 @@ vim.keymap.set("n", "<leader>lf", function()
     end)
 end, { buffer = true, desc = "Lua: insert function skeleton" })
 
--- <leader>lm — insert a module skeleton (return table pattern)
-vim.keymap.set("n", "<leader>lm", function()
+-- <leader>mm — insert a module skeleton (return table pattern)
+vim.keymap.set("n", "<leader>mm", function()
     local row = vim.api.nvim_win_get_cursor(0)[1]
     local lines = {
         "local M = {}",

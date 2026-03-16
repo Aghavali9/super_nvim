@@ -5,12 +5,12 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
     wk.add({
-        { "<leader>j", group = "Java", buffer = true },
+        { "<leader>m", group = "Java", buffer = true },
     })
 end
 
--- <leader>jc — insert a class skeleton (interactive)
-vim.keymap.set("n", "<leader>jc", function()
+-- <leader>mc — insert a class skeleton (interactive)
+vim.keymap.set("n", "<leader>mc", function()
     vim.ui.input({ prompt = "Class name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -29,8 +29,8 @@ vim.keymap.set("n", "<leader>jc", function()
     end)
 end, { buffer = true, desc = "Java: insert class skeleton" })
 
--- <leader>jm — insert a main() method skeleton
-vim.keymap.set("n", "<leader>jm", function()
+-- <leader>mm — insert a main() method skeleton
+vim.keymap.set("n", "<leader>mm", function()
     local row = vim.api.nvim_win_get_cursor(0)[1]
     local lines = {
         "public static void main(String[] args) {",
@@ -42,8 +42,8 @@ vim.keymap.set("n", "<leader>jm", function()
     vim.api.nvim_win_set_cursor(0, { row + 2, 4 })
 end, { buffer = true, desc = "Java: insert main() method" })
 
--- <leader>jg — generate getter and setter for a field (interactive)
-vim.keymap.set("n", "<leader>jg", function()
+-- <leader>mg — generate getter and setter for a field (interactive)
+vim.keymap.set("n", "<leader>mg", function()
     vim.ui.input({ prompt = "Field (type name, e.g. String name): " }, function(input)
         if not input or input == "" then return end
         local parts = vim.split(vim.trim(input), "%s+")
@@ -71,8 +71,8 @@ vim.keymap.set("n", "<leader>jg", function()
     end)
 end, { buffer = true, desc = "Java: generate getter/setter" })
 
--- <leader>ji — insert an interface skeleton (interactive)
-vim.keymap.set("n", "<leader>ji", function()
+-- <leader>mi — insert an interface skeleton (interactive)
+vim.keymap.set("n", "<leader>mi", function()
     vim.ui.input({ prompt = "Interface name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -87,8 +87,8 @@ vim.keymap.set("n", "<leader>ji", function()
     end)
 end, { buffer = true, desc = "Java: insert interface skeleton" })
 
--- <leader>jt — insert a JUnit 5 test method skeleton (interactive)
-vim.keymap.set("n", "<leader>jt", function()
+-- <leader>mt — insert a JUnit 5 test method skeleton (interactive)
+vim.keymap.set("n", "<leader>mt", function()
     vim.ui.input({ prompt = "Test method name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]

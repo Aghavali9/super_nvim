@@ -214,9 +214,9 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>dp` | Open markdown preview in browser |
-| `<leader>dt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
-| `<leader>da` | Auto-align/reformat markdown table under cursor |
+| `<leader>mp` | Open markdown preview in browser |
+| `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
+| `<leader>ma` | Auto-align/reformat markdown table under cursor |
 
 #### LuaSnip Snippets — Markdown
 | Trigger | Description |
@@ -260,10 +260,10 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>lr` | Source (reload) the current Lua file inside Neovim |
-| `<leader>lx` | Execute the current line as Lua and echo result |
-| `<leader>lf` | Insert function skeleton (interactive) |
-| `<leader>lm` | Insert module skeleton (`local M = {}` pattern) |
+| `<leader>mr` | Source (reload) the current Lua file inside Neovim |
+| `<leader>mx` | Execute the current line as Lua and echo result |
+| `<leader>mf` | Insert function skeleton (interactive) |
+| `<leader>mm` | Insert module skeleton (`local M = {}` pattern) |
 
 #### LuaSnip Snippets — Lua
 | Trigger | Description |
@@ -281,10 +281,10 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>ch` | Insert (or verify) `#ifndef` include guard |
-| `<leader>cm` | Insert `main()` skeleton |
-| `<leader>cs` | Insert `typedef struct` skeleton (interactive) |
-| `<leader>cf` | Insert function skeleton (interactive) |
+| `<leader>mh` | Insert (or verify) `#ifndef` include guard |
+| `<leader>mm` | Insert `main()` skeleton |
+| `<leader>ms` | Insert `typedef struct` skeleton (interactive) |
+| `<leader>mf` | Insert function skeleton (interactive) |
 
 #### LuaSnip Snippets — C
 | Trigger | Description |
@@ -315,11 +315,11 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>ch` | Insert `#ifndef` include guard |
-| `<leader>cc` | Insert class skeleton (interactive) |
-| `<leader>cm` | Insert `main()` skeleton |
-| `<leader>cf` | Insert function skeleton (interactive) |
-| `<leader>cn` | Insert namespace block (interactive) |
+| `<leader>mh` | Insert `#ifndef` include guard |
+| `<leader>mc` | Insert class skeleton (interactive) |
+| `<leader>mm` | Insert `main()` skeleton |
+| `<leader>mf` | Insert function skeleton (interactive) |
+| `<leader>mn` | Insert namespace block (interactive) |
 
 #### LuaSnip Snippets — C++
 | Trigger | Description |
@@ -338,11 +338,11 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>jc` | Insert class skeleton (interactive) |
-| `<leader>jm` | Insert `public static void main(String[] args)` method |
-| `<leader>jg` | Generate getter + setter for a field (interactive) |
-| `<leader>ji` | Insert interface skeleton (interactive) |
-| `<leader>jt` | Insert JUnit 5 test method skeleton (interactive) |
+| `<leader>mc` | Insert class skeleton (interactive) |
+| `<leader>mm` | Insert `public static void main(String[] args)` method |
+| `<leader>mg` | Generate getter + setter for a field (interactive) |
+| `<leader>mi` | Insert interface skeleton (interactive) |
+| `<leader>mt` | Insert JUnit 5 test method skeleton (interactive) |
 
 #### LuaSnip Snippets — Java
 | Trigger | Description |
@@ -536,12 +536,12 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 ├── installer.sh                # Automated installation script
 ├── README.md                   # This file
 ├── ftplugin/
-│   ├── markdown.lua            # Buffer-local Markdown keymaps (dp, dt, da)
+│   ├── markdown.lua            # Buffer-local Markdown keymaps (mp, mt, ma)
 │   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, mp, mi, mt, mv)
-│   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
-│   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
-│   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
-│   └── java.lua                # Buffer-local Java code-generation (jc, jm, jg, ji, jt)
+│   ├── lua.lua                 # Buffer-local Lua helpers (mr, mx, mf, mm)
+│   ├── c.lua                   # Buffer-local C code-generation (mh, mm, ms, mf)
+│   ├── cpp.lua                 # Buffer-local C++ code-generation (mh, mc, mm, mf, mn)
+│   └── java.lua                # Buffer-local Java code-generation (mc, mm, mg, mi, mt)
 └── lua/
     ├── custom_snippets.lua     # Additional C and CMake LuaSnip snippets (boiler, head, cmakeboiler)
     ├── config/
