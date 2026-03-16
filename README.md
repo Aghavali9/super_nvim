@@ -25,8 +25,10 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **Node.js & npm** (for some plugins)
 - **ripgrep** (for Telescope live_grep)
 - **GCC/Clang** (for C/C++ compilation)
+- **CMake** (for C project scaffolding and CMake-based builds)
 - **Python 3** (for Python LSP)
 - **Java JDK 11+** (for Java LSP / compilation)
+- **A Nerd Font** (optional, for icons and glyphs — e.g. JetBrainsMono or FiraCode Nerd Font)
 
 ## 🚀 Quick Installation
 
@@ -78,7 +80,9 @@ bash installer.sh
 ### Core Functionality
 - **[lazy.nvim](https://github.com/folke/lazy.nvim)** - Plugin manager
 - **[mason.nvim](https://github.com/williamboman/mason.nvim)** - LSP server installer
+- **[mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim)** - Bridge between Mason and nvim-lspconfig
 - **[nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)** - LSP configuration
+- **[plenary.nvim](https://github.com/nvim-lua/plenary.nvim)** - Lua utilities library (required by Telescope and Harpoon)
 
 ### Completion & Editing
 - **[nvim-cmp](https://github.com/hrsh7th/nvim-cmp)** - Autocompletion engine
@@ -86,8 +90,10 @@ bash installer.sh
 - **[cmp-buffer](https://github.com/hrsh7th/cmp-buffer)** - Buffer completion
 - **[cmp-path](https://github.com/hrsh7th/cmp-path)** - Path completion
 - **[LuaSnip](https://github.com/L3MON4D3/LuaSnip)** - Snippet engine with per-language snippets
+- **[cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip)** - LuaSnip completion source for nvim-cmp
+- **[friendly-snippets](https://github.com/rafamadriz/friendly-snippets)** - Community-curated VSCode-style snippet collection
 - **[nvim-autopairs](https://github.com/windwp/nvim-autopairs)** - Auto-close brackets / quotes
-- **[Comment.nvim](https://github.com/numToStr/Comment.nvim)** - Smart `gcc` / `gc` commenting
+- **[Comment.nvim](https://github.com/numToStr/Comment.nvim)** - Smart `gcc` / `gc` / `gb` commenting
 - **[nvim-surround](https://github.com/kylechui/nvim-surround)** - `ys` / `ds` / `cs` surround pairs
 
 ### Syntax & Highlighting
@@ -95,6 +101,7 @@ bash installer.sh
 
 ### Navigation & Search
 - **[telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)** - Fuzzy finder
+- **[telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim)** - Native FZF sorter for Telescope (faster sorting)
 - **[harpoon](https://github.com/theprimeagen/harpoon)** - Quick file navigation
 - **[undotree](https://github.com/mbbill/undotree)** - Visual undo history
 
@@ -104,6 +111,7 @@ bash installer.sh
 
 ### UI & Appearance
 - **[rose-pine](https://github.com/rose-pine/neovim)** - Beautiful colorscheme
+- **[nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)** - File type icons (requires a Nerd Font)
 - **[lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** - Statusline
 - **[alpha-nvim](https://github.com/goolord/alpha-nvim)** - Custom dashboard
 - **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI
@@ -151,6 +159,7 @@ The leader key is set to `<Space>`.
 | `<leader>s` | Search and replace word under cursor |
 | `gcc` | Toggle line comment |
 | `gc` (visual) | Toggle comment on selection |
+| `gb` (visual) | Toggle block comment |
 | `ys<motion><char>` | Surround with char |
 | `ds<char>` | Delete surrounding char |
 | `cs<old><new>` | Change surrounding char |
@@ -282,6 +291,19 @@ The leader key is set to `<Space>`.
 | `for` | `for (int i = 0; …)` loop |
 | `struct` | `typedef struct { … } Name;` |
 | `pr` | `printf("…", …);` |
+| `boiler` | Full C boilerplate with `stdio.h` / `stdlib.h` and `main()` |
+| `head` | `#ifndef` / `#define` / `#endif` header guard with mirroring |
+
+---
+
+### CMake
+
+> **Note**: CMake snippets are active in `CMakeLists.txt` files.
+
+#### LuaSnip Snippets — CMake
+| Trigger | Description |
+|---------|-------------|
+| `cmakeboiler` | Standard CMake project boilerplate (`cmake_minimum_required`, `project`, `add_executable`) |
 
 ---
 
@@ -420,6 +442,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 │   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
 │   └── java.lua                # Buffer-local Java code-generation (jc, jm, jg, ji, jt)
 └── lua/
+    ├── custom_snippets.lua     # Additional C and CMake LuaSnip snippets (boiler, head, cmakeboiler)
     ├── config/
     │   ├── options.lua         # Neovim options & leader key
     │   ├── keymaps.lua         # Global keybindings & Smart Build/Run
