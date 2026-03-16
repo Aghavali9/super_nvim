@@ -3,8 +3,8 @@
 
 -- ── Run & Test ───────────────────────────────────────────────────────────────
 
--- <leader>pt — run pytest for the project (or the current file as fallback)
-vim.keymap.set("n", "<leader>pt", function()
+-- <leader>mt — run pytest for the project (or the current file as fallback)
+vim.keymap.set("n", "<leader>mt", function()
     local cmd
     if vim.fn.filereadable("pyproject.toml") == 1 or vim.fn.filereadable("setup.py") == 1 then
         cmd = "python3 -m pytest -v"
@@ -14,8 +14,8 @@ vim.keymap.set("n", "<leader>pt", function()
     vim.cmd("belowright split | resize 15 | terminal " .. cmd)
 end, { buffer = true, desc = "Python: run pytest" })
 
--- <leader>pv — create / activate a .venv virtual environment
-vim.keymap.set("n", "<leader>pv", function()
+-- <leader>mv — create / activate a .venv virtual environment
+vim.keymap.set("n", "<leader>mv", function()
     local cmd
     if vim.fn.isdirectory(".venv") == 1 then
         cmd = "source .venv/bin/activate && echo 'venv activated'"

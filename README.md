@@ -214,9 +214,9 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>mp` | Open markdown preview in browser |
-| `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
-| `<leader>ma` | Auto-align/reformat markdown table under cursor |
+| `<leader>dp` | Open markdown preview in browser |
+| `<leader>dt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
+| `<leader>da` | Auto-align/reformat markdown table under cursor |
 
 #### LuaSnip Snippets — Markdown
 | Trigger | Description |
@@ -234,8 +234,8 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>pt` | Run pytest (project or current file) |
-| `<leader>pv` | Create / activate `.venv` virtual environment |
+| `<leader>mt` | Run pytest (project or current file) |
+| `<leader>mv` | Create / activate `.venv` virtual environment |
 | `<leader>md` | Insert Google-style docstring skeleton |
 | `<leader>mm` | Insert `if __name__ == "__main__":` block |
 | `<leader>mc` | Insert class skeleton (interactive) |
@@ -372,6 +372,93 @@ The leader key is set to `<Space>`.
 | `<S-Tab>` | Previous completion item |
 | `<CR>` | Confirm selection |
 
+---
+
+## 🏗️ Project Scaffolding
+
+Three ex-commands are available globally to scaffold new projects from scratch. Run them from inside an **empty directory** in Neovim.
+
+### `:CProject [name]`
+
+Scaffolds a standard C project layout using CMake.
+
+```vim
+:CProject MyApp
+```
+
+Creates:
+```
+MyApp/
+├── CMakeLists.txt      # cmake_minimum_required, project(), add_executable()
+├── .gitignore          # build/, *.o, compile_commands.json, …
+├── include/            # (empty — add your header files here)
+└── src/
+    └── main.c          # Minimal main() skeleton, opened automatically
+```
+
+After scaffolding, build with:
+```bash
+cmake -B build && cmake --build build
+./build/MyApp
+```
+
+---
+
+### `:PyProject [name]`
+
+Scaffolds a pip-installable Python package with a `src/` layout, a basic test, and a `pyproject.toml`.
+
+```vim
+:PyProject my_tool
+```
+
+Creates:
+```
+my_tool/
+├── pyproject.toml               # setuptools build backend, black / ruff config
+├── .gitignore                   # __pycache__/, .venv/, dist/, …
+├── src/
+│   └── my_tool/
+│       ├── __init__.py
+│       └── __main__.py          # main() entry-point, opened automatically
+└── tests/
+    └── test_basic.py            # pytest smoke test for main()
+```
+
+After scaffolding:
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -e .
+python3 -m my_tool
+```
+
+---
+
+### `:JavaProject [name]`
+
+Scaffolds a Maven project with a standard directory layout, `pom.xml`, and JUnit 5 dependency.
+
+```vim
+:JavaProject MyApp
+```
+
+Creates:
+```
+MyApp/
+├── pom.xml                                   # Maven build file (Java 11, JUnit 5)
+├── .gitignore                                # target/, *.class, .idea/, …
+└── src/
+    ├── main/java/com/example/
+    │   └── Main.java                         # public class Main with main(), opened automatically
+    └── test/java/com/example/               # (empty — add JUnit tests here)
+```
+
+After scaffolding:
+```bash
+mvn compile exec:java      # compile and run
+mvn test                   # run tests
+```
+
 ## 🔧 Configuration Details
 
 ### LSP Servers
@@ -447,8 +534,8 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 ├── installer.sh                # Automated installation script
 ├── README.md                   # This file
 ├── ftplugin/
-│   ├── markdown.lua            # Buffer-local Markdown keymaps (mp, mt, ma)
-│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, pt, pv)
+│   ├── markdown.lua            # Buffer-local Markdown keymaps (dp, dt, da)
+│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, mt, mv)
 │   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
 │   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
 │   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
