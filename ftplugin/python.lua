@@ -100,3 +100,45 @@ vim.keymap.set("n", "<leader>mf", function()
         vim.api.nvim_win_set_cursor(0, { row + 1, 4 })
     end)
 end, { buffer = true, desc = "Python: insert function skeleton" })
+
+-- <leader>mp — insert a @property + setter pair (interactive)
+vim.keymap.set("n", "<leader>mp", function()
+    vim.ui.input({ prompt = "Attribute name: " }, function(name)
+        if not name or name == "" then return end
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local lines = {
+            "@property",
+            "def " .. name .. "(self):",
+            '    """Get ' .. name .. '."""',
+            "    return self._" .. name,
+            "",
+            "@" .. name .. ".setter",
+            "def " .. name .. "(self, value):",
+            "    self._" .. name .. " = value",
+            "",
+        }
+        vim.api.nvim_buf_set_lines(0, row, row, false, lines)
+        -- Place cursor on the return statement (line 4 of the insertion, 4-space indent)
+        vim.api.nvim_win_set_cursor(0, { row + 4, 4 })
+    end)
+end, { buffer = true, desc = "Python: insert @property pair" })
+
+-- <leader>mi — insert a pytest test function skeleton (interactive)
+vim.keymap.set("n", "<leader>mi", function()
+    vim.ui.input({ prompt = "Test name (without test_ prefix): " }, function(name)
+        if not name or name == "" then return end
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local lines = {
+            "def test_" .. name .. "():",
+            "    # Arrange",
+            "    ",
+            "    # Act",
+            "    ",
+            "    # Assert",
+            "    ",
+        }
+        vim.api.nvim_buf_set_lines(0, row, row, false, lines)
+        -- Place cursor at the Arrange section body (line 3, 4-space indent)
+        vim.api.nvim_win_set_cursor(0, { row + 3, 4 })
+    end)
+end, { buffer = true, desc = "Python: insert test function skeleton" })

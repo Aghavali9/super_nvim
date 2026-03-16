@@ -240,6 +240,8 @@ The leader key is set to `<Space>`.
 | `<leader>mm` | Insert `if __name__ == "__main__":` block |
 | `<leader>mc` | Insert class skeleton (interactive) |
 | `<leader>mf` | Insert function skeleton (interactive) |
+| `<leader>mp` | Insert `@property` + setter pair (interactive) |
+| `<leader>mi` | Insert pytest test function skeleton (interactive) |
 
 #### LuaSnip Snippets — Python
 | Trigger | Description |
@@ -535,7 +537,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 ├── README.md                   # This file
 ├── ftplugin/
 │   ├── markdown.lua            # Buffer-local Markdown keymaps (dp, dt, da)
-│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, mt, mv)
+│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, mp, mi, mt, mv)
 │   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
 │   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
 │   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
