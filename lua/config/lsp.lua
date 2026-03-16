@@ -9,4 +9,4 @@ local capabilities = ok
 vim.lsp.config("*", { capabilities = capabilities })
 
 -- Enable servers (mason-lspconfig ensures they are installed)
-vim.lsp.enable({ "clangd", "pyright", "lua_ls" })
+vim.lsp.enable({ "clangd", "pyright", "lua_ls", "jdtls", "bashls" })
