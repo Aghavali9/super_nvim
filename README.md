@@ -214,9 +214,9 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>mp` | Open markdown preview in browser |
-| `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
-| `<leader>ma` | Auto-align/reformat markdown table under cursor |
+| `<leader>dp` | Open markdown preview in browser |
+| `<leader>dt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
+| `<leader>da` | Auto-align/reformat markdown table under cursor |
 
 #### LuaSnip Snippets — Markdown
 | Trigger | Description |
@@ -234,12 +234,12 @@ The leader key is set to `<Space>`.
 
 | Key | Action |
 |-----|--------|
-| `<leader>pt` | Run pytest (project or current file) |
-| `<leader>pv` | Create / activate `.venv` virtual environment |
-| `<leader>pd` | Insert Google-style docstring skeleton |
-| `<leader>pm` | Insert `if __name__ == "__main__":` block |
-| `<leader>pc` | Insert class skeleton (interactive) |
-| `<leader>pf` | Insert function skeleton (interactive) |
+| `<leader>mt` | Run pytest (project or current file) |
+| `<leader>mv` | Create / activate `.venv` virtual environment |
+| `<leader>md` | Insert Google-style docstring skeleton |
+| `<leader>mm` | Insert `if __name__ == "__main__":` block |
+| `<leader>mc` | Insert class skeleton (interactive) |
+| `<leader>mf` | Insert function skeleton (interactive) |
 
 #### LuaSnip Snippets — Python
 | Trigger | Description |
@@ -435,8 +435,8 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 ├── installer.sh                # Automated installation script
 ├── README.md                   # This file
 ├── ftplugin/
-│   ├── markdown.lua            # Buffer-local Markdown keymaps (mp, mt, ma)
-│   ├── python.lua              # Buffer-local Python code-generation (pd, pm, pc, pf, pt, pv)
+│   ├── markdown.lua            # Buffer-local Markdown keymaps (dp, dt, da)
+│   ├── python.lua              # Buffer-local Python code-generation (md, mm, mc, mf, mt, mv)
 │   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
 │   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
 │   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
