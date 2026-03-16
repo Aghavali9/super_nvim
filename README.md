@@ -353,6 +353,18 @@ The leader key is set to `<Space>`.
 
 ---
 
+### Project Scaffolding
+
+> **Note**: These commands scaffold a new project in the current working directory.
+
+| Command | Description |
+|---------|-------------|
+| `:CProject [name]` | Scaffolds a new C/C++ project with CMake (`CMakeLists.txt`, `src/main.c`, `include/`, `.gitignore`) |
+| `:PyProject [name]` | Scaffolds a new Python project with `pyproject.toml`, `src/<name>/`, `tests/`, and `.gitignore` |
+| `:JavaProject [name]` | Scaffolds a new Java/Maven project with `pom.xml`, standard `src/main/java/` layout, and `.gitignore` |
+
+---
+
 ### Autocompletion
 | Key | Action |
 |-----|--------|
