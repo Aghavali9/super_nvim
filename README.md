@@ -1,18 +1,22 @@
 # 🦇 BAT-VIM - Super Neovim Configuration
 
-A powerful, modern Neovim configuration optimized for multi-language development (C/C++, Python, Lua) with LSP support, Treesitter, and a carefully curated set of productivity plugins.
+A powerful, modern Neovim configuration optimized for multi-language development (C/C++, Python, Java, Lua, Bash) with LSP support, Treesitter, per-filetype code-generation helpers, and a carefully curated set of productivity plugins.
 
 ## ✨ Features
 
-- **Modern LSP Integration**: Full Language Server Protocol support for C/C++, Python, and Lua using Neovim 0.11+ native APIs
+- **Modern LSP Integration**: Full LSP support for C/C++, Python, Java, Lua, and Bash via Neovim 0.11+ native APIs
 - **Smart Autocompletion**: Intelligent code completion with nvim-cmp
 - **Syntax Highlighting**: Advanced syntax highlighting via Treesitter
 - **Fuzzy Finding**: Lightning-fast file/text search with Telescope
 - **Git Integration**: Built-in git tools (Fugitive, Gitsigns)
 - **Project Navigation**: Quick file switching with Harpoon
-- **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation (`<leader>mt`), table auto-alignment (`<leader>ma`), and LuaSnip table snippets (`tbl2x2`, `tbl3x2`, `tbl3x3`)
+- **Per-Filetype Code Generation**: Buffer-local keymaps in `ftplugin/` for Markdown, Python, Lua, C, C++, and Java — insert skeletons, docstrings, classes, getters/setters, and more without leaving the editor
+- **Rich Snippet Library**: LuaSnip snippets for every supported language
+- **Smart Commenting**: `gcc` / `gc` toggling via Comment.nvim
+- **Surround Pairs**: `ys` / `ds` / `cs` via nvim-surround
+- **Diagnostics Panel**: `<leader>xx` opens Trouble for project-wide diagnostics
+- **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation, table auto-alignment
 - **Beautiful UI**: Rose-Pine colorscheme with custom dashboard
-- **Pro Keybindings**: Optimized keyboard shortcuts for efficient editing
 
 ## 📋 Prerequisites
 
@@ -22,6 +26,7 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **ripgrep** (for Telescope live_grep)
 - **GCC/Clang** (for C/C++ compilation)
 - **Python 3** (for Python LSP)
+- **Java JDK 11+** (for Java LSP / compilation)
 
 ## 🚀 Quick Installation
 
@@ -66,7 +71,7 @@ bash installer.sh
    ```vim
    :Mason
    ```
-   Then install: `clangd`, `pyright`, `lua_ls`
+   Then install: `clangd`, `pyright`, `lua_ls`, `jdtls`, `bashls`
 
 ## 📦 Included Plugins
 
@@ -80,7 +85,13 @@ bash installer.sh
 - **[cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp)** - LSP completion source
 - **[cmp-buffer](https://github.com/hrsh7th/cmp-buffer)** - Buffer completion
 - **[cmp-path](https://github.com/hrsh7th/cmp-path)** - Path completion
-- **[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)** - Advanced syntax highlighting
+- **[LuaSnip](https://github.com/L3MON4D3/LuaSnip)** - Snippet engine with per-language snippets
+- **[nvim-autopairs](https://github.com/windwp/nvim-autopairs)** - Auto-close brackets / quotes
+- **[Comment.nvim](https://github.com/numToStr/Comment.nvim)** - Smart `gcc` / `gc` commenting
+- **[nvim-surround](https://github.com/kylechui/nvim-surround)** - `ys` / `ds` / `cs` surround pairs
+
+### Syntax & Highlighting
+- **[nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter)** - Advanced syntax highlighting (C, C++, Python, Lua, Java, Bash, JSON, YAML, TOML, Markdown)
 
 ### Navigation & Search
 - **[telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)** - Fuzzy finder
@@ -95,7 +106,12 @@ bash installer.sh
 - **[rose-pine](https://github.com/rose-pine/neovim)** - Beautiful colorscheme
 - **[lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** - Statusline
 - **[alpha-nvim](https://github.com/goolord/alpha-nvim)** - Custom dashboard
-- **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI for all `vim.ui` prompts
+- **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI
+- **[which-key.nvim](https://github.com/folke/which-key.nvim)** - Keymap hint popup
+- **[trouble.nvim](https://github.com/folke/trouble.nvim)** - Project-wide diagnostics list
+
+### Formatting
+- **[conform.nvim](https://github.com/stevearc/conform.nvim)** - Format-on-save (stylua, black, clang-format, prettier, shfmt)
 
 ### Markdown
 - **[markdown-preview.nvim](https://github.com/iamcco/markdown-preview.nvim)** - Live browser preview
@@ -112,6 +128,7 @@ The leader key is set to `<Space>`.
 | `<leader>e` | Open file explorer (netrw) |
 | `<leader>w` | Save file |
 | `<leader>q` | Quit |
+| `jk` | Exit insert mode |
 
 ### Navigation
 | Key | Action |
@@ -120,7 +137,6 @@ The leader key is set to `<Space>`.
 | `<C-u>` | Scroll up (centered) |
 | `n` / `N` | Next/previous search result (centered) |
 | `<C-h/j/k/l>` | Navigate between windows |
-| `<C-Left/Down/Up/Right>` | Navigate between windows (arrows) |
 
 ### Visual Mode
 | Key | Action |
@@ -133,6 +149,11 @@ The leader key is set to `<Space>`.
 | Key | Action |
 |-----|--------|
 | `<leader>s` | Search and replace word under cursor |
+| `gcc` | Toggle line comment |
+| `gc` (visual) | Toggle comment on selection |
+| `ys<motion><char>` | Surround with char |
+| `ds<char>` | Delete surrounding char |
+| `cs<old><new>` | Change surrounding char |
 
 ### LSP (Language Server)
 | Key | Action |
@@ -143,6 +164,13 @@ The leader key is set to `<Space>`.
 | `<leader>rn` | Rename symbol |
 | `<leader>ca` | Code actions |
 | `<leader>fd` | Show diagnostics (Telescope) |
+
+### Diagnostics
+| Key | Action |
+|-----|--------|
+| `<leader>xx` | Toggle project-wide diagnostics (Trouble) |
+| `<leader>xX` | Toggle buffer diagnostics (Trouble) |
+| `<leader>xq` | Toggle quickfix list (Trouble) |
 
 ### Telescope (Fuzzy Finder)
 | Key | Action |
@@ -164,10 +192,12 @@ The leader key is set to `<Space>`.
 | `<leader>gs` | Git status (Fugitive) |
 | `<leader>u` | Toggle undo tree |
 
-### C/C++ Development
+### Smart Build & Run (global)
 | Key | Action |
 |-----|--------|
-| `<leader>r` | Compile and run current C/C++ file |
+| `<leader>r` | Compile and run current file (C, C++, Python, Java) |
+
+---
 
 ### Markdown
 
@@ -179,13 +209,127 @@ The leader key is set to `<Space>`.
 | `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
 | `<leader>ma` | Auto-align/reformat markdown table under cursor |
 
-#### LuaSnip Table Snippets (markdown files only)
+#### LuaSnip Snippets — Markdown
 | Trigger | Description |
 |---------|-------------|
-| `tbl2x2` | 2-column, 2-row table with tab stops in each cell |
-| `tbl3x2` | 3-column, 2-row table with tab stops in each cell |
-| `tbl3x3` | 3-column, 3-row table with tab stops in each cell |
-| `tbl` | Quick 2-column, 1-row starter table |
+| `tbl2x2` | 2-column, 2-row table |
+| `tbl3x2` | 3-column, 2-row table |
+| `tbl3x3` | 3-column, 3-row table |
+| `tbl` | Quick 2-column starter table |
+
+---
+
+### Python
+
+> **Note**: Python keybinds are buffer-local — only active in `.py` files.
+
+| Key | Action |
+|-----|--------|
+| `<leader>pt` | Run pytest (project or current file) |
+| `<leader>pv` | Create / activate `.venv` virtual environment |
+| `<leader>pd` | Insert Google-style docstring skeleton |
+| `<leader>pm` | Insert `if __name__ == "__main__":` block |
+| `<leader>pc` | Insert class skeleton (interactive) |
+| `<leader>pf` | Insert function skeleton (interactive) |
+
+#### LuaSnip Snippets — Python
+| Trigger | Description |
+|---------|-------------|
+| `def` | Function with docstring |
+| `class` | Class with `__init__` |
+| `main` | `if __name__ == "__main__":` guard |
+| `test` | pytest test function (Arrange / Act / Assert) |
+| `prop` | Property getter + setter pair |
+
+---
+
+### Lua
+
+> **Note**: Lua keybinds are buffer-local — only active in `.lua` files.
+
+| Key | Action |
+|-----|--------|
+| `<leader>lr` | Source (reload) the current Lua file inside Neovim |
+| `<leader>lx` | Execute the current line as Lua and echo result |
+| `<leader>lf` | Insert function skeleton (interactive) |
+| `<leader>lm` | Insert module skeleton (`local M = {}` pattern) |
+
+#### LuaSnip Snippets — Lua
+| Trigger | Description |
+|---------|-------------|
+| `fn` | Local function skeleton |
+| `mod` | Module skeleton (`local M = {}`) |
+| `req` | `local x = require("…")` |
+| `kmap` | `vim.keymap.set(…)` boilerplate |
+
+---
+
+### C
+
+> **Note**: C keybinds are buffer-local — only active in `.c` / `.h` files.
+
+| Key | Action |
+|-----|--------|
+| `<leader>ch` | Insert (or verify) `#ifndef` include guard |
+| `<leader>cm` | Insert `main()` skeleton |
+| `<leader>cs` | Insert `typedef struct` skeleton (interactive) |
+| `<leader>cf` | Insert function skeleton (interactive) |
+
+#### LuaSnip Snippets — C
+| Trigger | Description |
+|---------|-------------|
+| `main` | `#include` headers + `main()` |
+| `for` | `for (int i = 0; …)` loop |
+| `struct` | `typedef struct { … } Name;` |
+| `pr` | `printf("…", …);` |
+
+---
+
+### C++
+
+> **Note**: C++ keybinds are buffer-local — only active in `.cpp` / `.hpp` files.
+
+| Key | Action |
+|-----|--------|
+| `<leader>ch` | Insert `#ifndef` include guard |
+| `<leader>cc` | Insert class skeleton (interactive) |
+| `<leader>cm` | Insert `main()` skeleton |
+| `<leader>cf` | Insert function skeleton (interactive) |
+| `<leader>cn` | Insert namespace block (interactive) |
+
+#### LuaSnip Snippets — C++
+| Trigger | Description |
+|---------|-------------|
+| `main` | `#include <iostream>` + `main()` |
+| `class` | Class skeleton with constructor/destructor |
+| `forr` | Range-based `for (auto& item : container)` |
+| `co` | `std::cout << … << std::endl;` |
+| `ns` | `namespace name { … }` block |
+
+---
+
+### Java
+
+> **Note**: Java keybinds are buffer-local — only active in `.java` files.
+
+| Key | Action |
+|-----|--------|
+| `<leader>jc` | Insert class skeleton (interactive) |
+| `<leader>jm` | Insert `public static void main(String[] args)` method |
+| `<leader>jg` | Generate getter + setter for a field (interactive) |
+| `<leader>ji` | Insert interface skeleton (interactive) |
+| `<leader>jt` | Insert JUnit 5 test method skeleton (interactive) |
+
+#### LuaSnip Snippets — Java
+| Trigger | Description |
+|---------|-------------|
+| `main` | `public class Main` with `main()` method |
+| `fore` | Enhanced for-each loop |
+| `sout` | `System.out.println(…)` |
+| `gs` | Getter + setter pair |
+| `test` | JUnit 5 `@Test` method (Arrange / Act / Assert) |
+
+---
 
 ### Autocompletion
 | Key | Action |
@@ -197,46 +341,46 @@ The leader key is set to `<Space>`.
 ## 🔧 Configuration Details
 
 ### LSP Servers
-The following language servers are pre-configured:
+The following language servers are pre-configured and auto-installed via Mason:
 - **clangd** - C/C++
-- **pyright** - Python  
+- **pyright** - Python
 - **lua_ls** - Lua
-
-To add more servers, edit the `servers` table in `init.lua`:
-```lua
-local servers = { 'clangd', 'pyright', 'lua_ls', 'rust_analyzer' }
-```
+- **jdtls** - Java
+- **bashls** - Bash / shell scripts
 
 ### Treesitter Languages
-Pre-installed syntax support for:
-- C
-- C++
-- Lua
-- Python
-- Markdown
+Pre-installed syntax support for C, C++, Lua, Python, Java, Bash, Markdown, JSON, YAML, and TOML.
 
 ### Format on Save
-Automatic formatting is enabled for all LSP-supported languages when saving files.
+Automatic formatting is configured for:
+
+| Filetype | Formatter |
+|----------|-----------|
+| Lua | stylua |
+| Python | black |
+| C / C++ / Java | clang-format |
+| Bash / sh | shfmt |
+| Markdown / JSON / YAML | prettier |
 
 ## 🎨 Customization
 
 ### Changing Colorscheme
-Edit the colorscheme line in `init.lua`:
+Edit `lua/plugins/ui.lua`:
 ```lua
-vim.cmd("colorscheme rose-pine")
+vim.cmd.colorscheme("rose-pine")
 ```
 
-### Modifying Dashboard
-The dashboard header can be customized in section 9 of `init.lua`.
-
-### Adding Plugins
-Add plugins in the lazy.nvim setup block:
+### Adding a New Plugin
+Create a new file in `lua/plugins/` (e.g. `lua/plugins/myplugin.lua`) and return a lazy.nvim spec table:
 ```lua
-require('lazy').setup({
-  { 'author/plugin-name' },
-})
+return {
+  { "author/plugin-name", config = true },
+}
 ```
 Then run `:Lazy sync` in Neovim.
+
+### Adding Per-Filetype Keymaps
+Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buffer of that type. Use `{ buffer = true }` on all `vim.keymap.set` calls.
 
 ## 🐛 Troubleshooting
 
@@ -265,18 +409,38 @@ Then run `:Lazy sync` in Neovim.
 
 ```
 ~/.config/nvim/
-├── init.lua                    # Main configuration file
+├── init.lua                    # Bootstrap lazy.nvim and load config modules
 ├── installer.sh                # Automated installation script
 ├── README.md                   # This file
 ├── ftplugin/
-│   └── markdown.lua            # Buffer-local markdown keymaps (mp, mt, ma)
+│   ├── markdown.lua            # Buffer-local Markdown keymaps (mp, mt, ma)
+│   ├── python.lua              # Buffer-local Python code-generation (pd, pm, pc, pf, pt, pv)
+│   ├── lua.lua                 # Buffer-local Lua helpers (lr, lx, lf, lm)
+│   ├── c.lua                   # Buffer-local C code-generation (ch, cm, cs, cf)
+│   ├── cpp.lua                 # Buffer-local C++ code-generation (ch, cc, cm, cf, cn)
+│   └── java.lua                # Buffer-local Java code-generation (jc, jm, jg, ji, jt)
 └── lua/
     ├── config/
-    │   ├── keymaps.lua         # Global keybindings
-    │   ├── snippets.lua        # LuaSnip markdown table snippets
-    │   └── ...                 # Other config modules
+    │   ├── options.lua         # Neovim options & leader key
+    │   ├── keymaps.lua         # Global keybindings & Smart Build/Run
+    │   ├── autocmds.lua        # LspAttach autocommand (gd, gr, K, …)
+    │   ├── lsp.lua             # LSP capabilities & server list
+    │   ├── cmp.lua             # nvim-cmp completion setup
+    │   ├── formatting.lua      # conform.nvim format-on-save
+    │   ├── snippets.lua        # LuaSnip snippets for all languages
+    │   ├── scaffolding.lua     # :CProject / :PyProject / :JavaProject commands
+    │   ├── telescope.lua       # Telescope pickers & keymaps
+    │   └── ui.lua              # Alpha dashboard configuration
     └── plugins/
-        └── init.lua            # Plugin specifications
+        ├── init.lua            # (empty — lazy.nvim loads all files in this dir)
+        ├── ui.lua              # Colorscheme, icons, dashboard, lualine, which-key, trouble
+        ├── lsp.lua             # mason + nvim-lspconfig
+        ├── completion.lua      # nvim-cmp + LuaSnip + autopairs
+        ├── treesitter.lua      # nvim-treesitter
+        ├── navigation.lua      # telescope + harpoon
+        ├── git.lua             # gitsigns + vim-fugitive
+        ├── editing.lua         # conform + undotree + Comment.nvim + nvim-surround
+        └── markdown.lua        # markdown-preview + render-markdown
 ```
 
 ## 🤝 Contributing
