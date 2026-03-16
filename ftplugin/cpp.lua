@@ -1,8 +1,16 @@
 -- ftplugin/cpp.lua
 -- Buffer-local keymaps and code-generation helpers for C++ files
 
--- <leader>ch — insert (or update) an include-guard for the current header file
-vim.keymap.set("n", "<leader>ch", function()
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>m", group = "C++", buffer = true },
+    })
+end
+
+-- <leader>mh — insert (or update) an include-guard for the current header file
+vim.keymap.set("n", "<leader>mh", function()
     local fname = vim.fn.expand("%:t"):upper():gsub("[%.%-%s]", "_")
     local guard = fname .. "_HPP"
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -34,8 +42,8 @@ vim.keymap.set("n", "<leader>ch", function()
     vim.notify("Include guard added: " .. guard, vim.log.levels.INFO)
 end, { buffer = true, desc = "C++: insert include guard" })
 
--- <leader>cc — insert a class skeleton (interactive)
-vim.keymap.set("n", "<leader>cc", function()
+-- <leader>mc — insert a class skeleton (interactive)
+vim.keymap.set("n", "<leader>mc", function()
     vim.ui.input({ prompt = "Class name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -55,8 +63,8 @@ vim.keymap.set("n", "<leader>cc", function()
     end)
 end, { buffer = true, desc = "C++: insert class skeleton" })
 
--- <leader>cm — insert a main() function skeleton
-vim.keymap.set("n", "<leader>cm", function()
+-- <leader>mm — insert a main() function skeleton
+vim.keymap.set("n", "<leader>mm", function()
     local row = vim.api.nvim_win_get_cursor(0)[1]
     local lines = {
         "int main(int argc, char* argv[]) {",
@@ -69,8 +77,8 @@ vim.keymap.set("n", "<leader>cm", function()
     vim.api.nvim_win_set_cursor(0, { row + 2, 4 })
 end, { buffer = true, desc = "C++: insert main() skeleton" })
 
--- <leader>cf — insert a function skeleton (interactive)
-vim.keymap.set("n", "<leader>cf", function()
+-- <leader>mf — insert a function skeleton (interactive)
+vim.keymap.set("n", "<leader>mf", function()
     vim.ui.input({ prompt = "Function signature (e.g. int add(int a, int b)): " }, function(sig)
         if not sig or sig == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -85,8 +93,8 @@ vim.keymap.set("n", "<leader>cf", function()
     end)
 end, { buffer = true, desc = "C++: insert function skeleton" })
 
--- <leader>cn — insert a namespace block (interactive)
-vim.keymap.set("n", "<leader>cn", function()
+-- <leader>mn — insert a namespace block (interactive)
+vim.keymap.set("n", "<leader>mn", function()
     vim.ui.input({ prompt = "Namespace name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]

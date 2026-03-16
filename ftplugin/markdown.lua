@@ -1,10 +1,18 @@
 -- ftplugin/markdown.lua
 -- Buffer-local keymaps for markdown files (loaded automatically by Neovim for *.md)
 
-vim.keymap.set("n", "<leader>dp", ":MarkdownPreview<CR>", { buffer = true, desc = "Markdown preview" })
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>m", group = "Markdown", buffer = true },
+    })
+end
 
--- <leader>dt — interactive markdown table generator (single CxR prompt)
-vim.keymap.set("n", "<leader>dt", function()
+vim.keymap.set("n", "<leader>mp", ":MarkdownPreview<CR>", { buffer = true, desc = "Markdown preview" })
+
+-- <leader>mt — interactive markdown table generator (single CxR prompt)
+vim.keymap.set("n", "<leader>mt", function()
     vim.ui.input({ prompt = "Table size (CxR, e.g. 3x2): " }, function(input)
         if not input or input == "" then
             return
@@ -58,8 +66,8 @@ vim.keymap.set("n", "<leader>dt", function()
     end)
 end, { buffer = true, desc = "Markdown table generator" })
 
--- <leader>da — auto-align/reformat the markdown table under cursor
-vim.keymap.set("n", "<leader>da", function()
+-- <leader>ma — auto-align/reformat the markdown table under cursor
+vim.keymap.set("n", "<leader>ma", function()
     local buf = 0
     local cursor_row = vim.api.nvim_win_get_cursor(0)[1] -- 1-indexed
     local total_lines = vim.api.nvim_buf_line_count(buf)

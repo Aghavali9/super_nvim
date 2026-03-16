@@ -1,8 +1,16 @@
 -- ftplugin/c.lua
 -- Buffer-local keymaps and code-generation helpers for C files
 
--- <leader>ch — insert (or update) an include-guard for the current header file
-vim.keymap.set("n", "<leader>ch", function()
+-- Register which-key group for this buffer
+local ok, wk = pcall(require, "which-key")
+if ok then
+    wk.add({
+        { "<leader>m", group = "C", buffer = true },
+    })
+end
+
+-- <leader>mh — insert (or update) an include-guard for the current header file
+vim.keymap.set("n", "<leader>mh", function()
     local fname = vim.fn.expand("%:t"):upper():gsub("[%.%-%s]", "_")
     local guard = fname .. "_H"
     local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
@@ -36,8 +44,8 @@ vim.keymap.set("n", "<leader>ch", function()
     vim.notify("Include guard added: " .. guard, vim.log.levels.INFO)
 end, { buffer = true, desc = "C: insert include guard" })
 
--- <leader>cm — insert a main() function skeleton at cursor position
-vim.keymap.set("n", "<leader>cm", function()
+-- <leader>mm — insert a main() function skeleton at cursor position
+vim.keymap.set("n", "<leader>mm", function()
     local row = vim.api.nvim_win_get_cursor(0)[1]
     local lines = {
         "int main(int argc, char *argv[]) {",
@@ -50,8 +58,8 @@ vim.keymap.set("n", "<leader>cm", function()
     vim.api.nvim_win_set_cursor(0, { row + 2, 4 })
 end, { buffer = true, desc = "C: insert main() skeleton" })
 
--- <leader>cs — insert a struct skeleton (interactive)
-vim.keymap.set("n", "<leader>cs", function()
+-- <leader>ms — insert a struct skeleton (interactive)
+vim.keymap.set("n", "<leader>ms", function()
     vim.ui.input({ prompt = "Struct name: " }, function(name)
         if not name or name == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
@@ -66,8 +74,8 @@ vim.keymap.set("n", "<leader>cs", function()
     end)
 end, { buffer = true, desc = "C: insert struct skeleton" })
 
--- <leader>cf — insert a function prototype + definition (interactive)
-vim.keymap.set("n", "<leader>cf", function()
+-- <leader>mf — insert a function prototype + definition (interactive)
+vim.keymap.set("n", "<leader>mf", function()
     vim.ui.input({ prompt = "Function signature (e.g. int add(int a, int b)): " }, function(sig)
         if not sig or sig == "" then return end
         local row = vim.api.nvim_win_get_cursor(0)[1]
