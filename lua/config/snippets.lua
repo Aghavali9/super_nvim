@@ -90,6 +90,13 @@ ls.add_snippets("python", {
         f(function(args) return args[1][1] end, { 1 }), t(" = value"),
     }),
 
+    -- try / except / finally
+    s("try", {
+        t({ "try:", "    " }), i(1, "pass"),
+        t({ "", "except " }), i(2, "Exception"), t({ " as e:", "    " }), i(3, "raise"),
+        t({ "", "finally:", "    " }), i(4, "pass"),
+    }),
+
 })
 
 -- ── Lua ──────────────────────────────────────────────────────────────────────

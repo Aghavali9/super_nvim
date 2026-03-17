@@ -103,6 +103,7 @@ bash installer.sh
 - **[telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)** - Fuzzy finder
 - **[telescope-fzf-native.nvim](https://github.com/nvim-telescope/telescope-fzf-native.nvim)** - Native FZF sorter for Telescope (faster sorting)
 - **[harpoon](https://github.com/theprimeagen/harpoon)** - Quick file navigation
+- **[oil.nvim](https://github.com/stevearc/oil.nvim)** - Edit the filesystem like a buffer
 - **[undotree](https://github.com/mbbill/undotree)** - Visual undo history
 
 ### Git Integration
@@ -133,7 +134,8 @@ The leader key is set to `<Space>`.
 ### General Operations
 | Key | Action |
 |-----|--------|
-| `<leader>e` | Open file explorer (netrw) |
+| `<leader>e` | Open file explorer (Oil) |
+| `-` | Open parent directory (Oil) |
 | `<leader>w` | Save file |
 | `<leader>q` | Quit |
 | `jk` | Exit insert mode |
@@ -251,6 +253,7 @@ The leader key is set to `<Space>`.
 | `main` | `if __name__ == "__main__":` guard |
 | `test` | pytest test function (Arrange / Act / Assert) |
 | `prop` | Property getter + setter pair |
+| `try` | `try` / `except` / `finally` block |
 
 ---
 
@@ -561,7 +564,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
         ├── lsp.lua             # mason + nvim-lspconfig
         ├── completion.lua      # nvim-cmp + LuaSnip + autopairs
         ├── treesitter.lua      # nvim-treesitter
-        ├── navigation.lua      # telescope + harpoon
+        ├── navigation.lua      # telescope + harpoon + oil.nvim
         ├── git.lua             # gitsigns + vim-fugitive
         ├── editing.lua         # conform + undotree + Comment.nvim + nvim-surround
         └── markdown.lua        # markdown-preview + render-markdown
