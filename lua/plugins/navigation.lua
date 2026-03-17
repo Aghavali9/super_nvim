@@ -1,7 +1,16 @@
 -- lua/plugins/navigation.lua
--- Telescope fuzzy-finder and Harpoon file-marks
+-- Telescope fuzzy-finder, Harpoon file-marks, and Oil file manager
 
 return {
+
+	-- ── Oil (file manager) ────────────────────────────────────────────────────
+	{
+		"stevearc/oil.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+		config = function()
+			require("oil").setup()
+		end,
+	},
 
 	-- ── Telescope ─────────────────────────────────────────────────────────────
 	{
