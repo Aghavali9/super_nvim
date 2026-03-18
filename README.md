@@ -5,7 +5,7 @@ A powerful, modern Neovim configuration optimized for multi-language development
 ## ✨ Features
 
 - **Modern LSP Integration**: Full LSP support for C/C++, Python, Java, Lua, and Bash via Neovim 0.11+ native APIs
-- **Smart Autocompletion**: Intelligent code completion with nvim-cmp
+- **Blazing-Fast Autocompletion**: Intelligent code completion with blink.cmp (Rust-powered)
 - **Syntax Highlighting**: Advanced syntax highlighting via Treesitter
 - **Fuzzy Finding**: Lightning-fast file/text search with Telescope
 - **Git Integration**: Built-in git tools (Fugitive, Gitsigns)
@@ -16,7 +16,8 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **Surround Pairs**: `ys` / `ds` / `cs` via nvim-surround
 - **Diagnostics Panel**: `<leader>xx` opens Trouble for project-wide diagnostics
 - **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation, table auto-alignment
-- **Beautiful UI**: Rose-Pine colorscheme with custom dashboard
+- **Obsidian Integration**: First-class Obsidian vault support with obsidian.nvim
+- **Beautiful UI**: Rose-Pine colorscheme, custom dashboard, and noice.nvim UI overhaul (enhanced messages, command palette, LSP hover borders)
 
 ## 📋 Prerequisites
 
@@ -85,12 +86,8 @@ bash installer.sh
 - **[plenary.nvim](https://github.com/nvim-lua/plenary.nvim)** - Lua utilities library (required by Telescope and Harpoon)
 
 ### Completion & Editing
-- **[nvim-cmp](https://github.com/hrsh7th/nvim-cmp)** - Autocompletion engine
-- **[cmp-nvim-lsp](https://github.com/hrsh7th/cmp-nvim-lsp)** - LSP completion source
-- **[cmp-buffer](https://github.com/hrsh7th/cmp-buffer)** - Buffer completion
-- **[cmp-path](https://github.com/hrsh7th/cmp-path)** - Path completion
+- **[blink.cmp](https://github.com/Saghen/blink.cmp)** - Blazing-fast autocompletion engine (Rust-powered)
 - **[LuaSnip](https://github.com/L3MON4D3/LuaSnip)** - Snippet engine with per-language snippets
-- **[cmp_luasnip](https://github.com/saadparwaiz1/cmp_luasnip)** - LuaSnip completion source for nvim-cmp
 - **[friendly-snippets](https://github.com/rafamadriz/friendly-snippets)** - Community-curated VSCode-style snippet collection
 - **[nvim-autopairs](https://github.com/windwp/nvim-autopairs)** - Auto-close brackets / quotes
 - **[Comment.nvim](https://github.com/numToStr/Comment.nvim)** - Smart `gcc` / `gc` / `gb` commenting
@@ -115,6 +112,9 @@ bash installer.sh
 - **[nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)** - File type icons (requires a Nerd Font)
 - **[lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** - Statusline
 - **[alpha-nvim](https://github.com/goolord/alpha-nvim)** - Custom dashboard
+- **[noice.nvim](https://github.com/folke/noice.nvim)** - UI overhaul: floating cmdline, message history, LSP hover borders
+- **[nvim-notify](https://github.com/rcarriga/nvim-notify)** - Animated notification popups (used by noice.nvim)
+- **[nui.nvim](https://github.com/MunifTanjim/nui.nvim)** - UI component library (required by noice.nvim)
 - **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI
 - **[which-key.nvim](https://github.com/folke/which-key.nvim)** - Keymap hint popup
 - **[trouble.nvim](https://github.com/folke/trouble.nvim)** - Project-wide diagnostics list
@@ -125,6 +125,7 @@ bash installer.sh
 ### Markdown
 - **[markdown-preview.nvim](https://github.com/iamcco/markdown-preview.nvim)** - Live browser preview
 - **[render-markdown.nvim](https://github.com/MeanderingProgrammer/render-markdown.nvim)** - In-editor Obsidian-style rendering
+- **[obsidian.nvim](https://github.com/epwalsh/obsidian.nvim)** - Obsidian vault integration (note linking, templates, search)
 
 ## ⌨️ Keybindings
 
@@ -219,6 +220,21 @@ The leader key is set to `<Space>`.
 | `<leader>mp` | Open markdown preview in browser |
 | `<leader>mt` | Generate markdown table (interactive, CxR format e.g. `3x2`) |
 | `<leader>ma` | Auto-align/reformat markdown table under cursor |
+
+#### Obsidian (in `.md` files inside your vault)
+
+| Key | Action |
+|-----|--------|
+| `:ObsidianNew` | Create a new note |
+| `:ObsidianOpen` | Open current note in Obsidian app |
+| `:ObsidianSearch` | Search notes (Telescope) |
+| `:ObsidianLinks` | List links in current note |
+| `:ObsidianBacklinks` | Show backlinks to current note |
+| `:ObsidianFollowLink` | Follow wiki-link under cursor |
+| `:ObsidianToday` | Open / create today's daily note |
+| `:ObsidianTemplate` | Insert a template |
+
+> **Note**: Set your vault path in `lua/plugins/markdown.lua` (`workspaces[1].path`, default: `~/obsidian`).
 
 #### LuaSnip Snippets — Markdown
 | Trigger | Description |
@@ -551,8 +567,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
     │   ├── options.lua         # Neovim options & leader key
     │   ├── keymaps.lua         # Global keybindings & Smart Build/Run
     │   ├── autocmds.lua        # LspAttach autocommand (gd, gr, K, …)
-    │   ├── lsp.lua             # LSP capabilities & server list
-    │   ├── cmp.lua             # nvim-cmp completion setup
+    │   ├── lsp.lua             # LSP capabilities (blink.cmp) & server list
     │   ├── formatting.lua      # conform.nvim format-on-save
     │   ├── snippets.lua        # LuaSnip snippets for all languages
     │   ├── scaffolding.lua     # :CProject / :PyProject / :JavaProject commands
@@ -560,14 +575,14 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
     │   └── ui.lua              # Alpha dashboard configuration
     └── plugins/
         ├── init.lua            # (empty — lazy.nvim loads all files in this dir)
-        ├── ui.lua              # Colorscheme, icons, dashboard, lualine, which-key, trouble
+        ├── ui.lua              # Colorscheme, icons, dashboard, lualine, which-key, trouble, noice
         ├── lsp.lua             # mason + nvim-lspconfig
-        ├── completion.lua      # nvim-cmp + LuaSnip + autopairs
+        ├── completion.lua      # blink.cmp + LuaSnip + autopairs
         ├── treesitter.lua      # nvim-treesitter
         ├── navigation.lua      # telescope + harpoon + oil.nvim
         ├── git.lua             # gitsigns + vim-fugitive
         ├── editing.lua         # conform + undotree + Comment.nvim + nvim-surround
-        └── markdown.lua        # markdown-preview + render-markdown
+        └── markdown.lua        # markdown-preview + render-markdown + obsidian.nvim
 ```
 
 ## 🤝 Contributing

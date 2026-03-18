@@ -1,8 +1,8 @@
 -- lua/config/lsp.lua  (Neovim 0.11+ native LSP)
 
-local ok, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+local ok, blink = pcall(require, "blink.cmp")
 local capabilities = ok
-  and cmp_nvim_lsp.default_capabilities()
+  and blink.get_lsp_capabilities()
   or vim.lsp.protocol.make_client_capabilities()
 
 -- Apply capabilities globally to all servers

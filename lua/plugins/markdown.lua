@@ -1,5 +1,5 @@
 -- lua/plugins/markdown.lua
--- Markdown preview and inline rendering
+-- Markdown preview, inline rendering, and Obsidian integration
 
 return {
 	{
@@ -12,5 +12,31 @@ return {
 		"MeanderingProgrammer/render-markdown.nvim",
 		ft = { "markdown" },
 		config = true,
+	},
+
+	-- ── Obsidian vault integration ────────────────────────────────────────────
+	{
+		"epwalsh/obsidian.nvim",
+		version = "*",
+		lazy = true,
+		ft = "markdown",
+		dependencies = { "nvim-lua/plenary.nvim" },
+		opts = {
+			workspaces = {
+				{
+					name = "personal",
+					path = "~/obsidian",
+				},
+			},
+			notes_subdir = "notes",
+			new_notes_location = "notes_subdir",
+			completion = {
+				nvim_cmp = false,
+				blink = true,
+			},
+			ui = {
+				enable = false, -- render-markdown.nvim handles rendering
+			},
+		},
 	},
 }
