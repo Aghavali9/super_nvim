@@ -548,6 +548,7 @@ The leader key is set to `<Space>`.
 | `<C-e>` | Dismiss completion menu |
 | `<C-b>` / `<C-f>` | Scroll the documentation preview window up/down |
 
+> **Ghost text**: As you type, the currently-selected suggestion is shown as dimmed inline text right after your cursor — you see exactly what will be inserted before pressing `<CR>`. As you scroll through the menu with `<Tab>`/`<S-Tab>`, the ghost text updates to match the highlighted item.  
 > **Preview**: A documentation/signature preview window appears automatically when you highlight a suggestion — no extra keypress needed.  
 > **Snippet jumps**: `<C-k>` / `<C-j>` jump forward/backward through active LuaSnip placeholders (works in both insert and select mode).
 

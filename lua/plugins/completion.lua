@@ -61,6 +61,9 @@ return {
 				["<C-f>"]     = { "scroll_documentation_down", "fallback" },
 			},
 			completion = {
+				-- Show the top suggestion as dimmed ghost text inline in the buffer
+				-- so you can preview exactly what will be inserted before accepting.
+				ghost_text = { enabled = true },
 				-- Automatically show the documentation/preview window when an
 				-- item is highlighted so the user sees docs while scrolling.
 				documentation = {
