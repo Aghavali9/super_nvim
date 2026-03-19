@@ -43,22 +43,41 @@ return {
 		opts = {
 			keymap = {
 				preset = "none",
-				-- Accept selected completion with Tab, Shift-Tab, or Enter.
-				-- When no completion menu is active, Tab/S-Tab forward/backward
-				-- jump active snippet placeholders; otherwise fall back to
-				-- normal Vim indent behaviour.
+				-- Tab / S-Tab: scroll through suggestions when the menu is open;
+				-- when the menu is closed but a snippet is active, jump through
+				-- its placeholders; otherwise fall back to normal Vim tab/indent.
+				["<Tab>"]     = { "select_next", "snippet_forward", "fallback" },
+				["<S-Tab>"]   = { "select_prev", "snippet_backward", "fallback" },
+				-- Accept the currently selected suggestion with Enter.
 				["<CR>"]      = { "accept", "fallback" },
-				["<Tab>"]     = { "accept", "snippet_forward", "fallback" },
-				["<S-Tab>"]   = { "accept", "snippet_backward", "fallback" },
-				-- Navigate the completion list with arrow keys
+				-- Arrow keys also navigate (convenience).
 				["<Up>"]      = { "select_prev", "fallback" },
 				["<Down>"]    = { "select_next", "fallback" },
-				-- Show / hide completion
+				-- Show / hide completion and documentation.
 				["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
 				["<C-e>"]     = { "hide", "fallback" },
-				-- Scroll documentation
+				-- Scroll the documentation preview window.
 				["<C-b>"]     = { "scroll_documentation_up", "fallback" },
 				["<C-f>"]     = { "scroll_documentation_down", "fallback" },
+			},
+			completion = {
+				-- Automatically show the documentation/preview window when an
+				-- item is highlighted so the user sees docs while scrolling.
+				documentation = {
+					auto_show = true,
+					auto_show_delay_ms = 200,
+					window = {
+						border = "rounded",
+						max_width = 80,
+						max_height = 20,
+					},
+				},
+				menu = {
+					border = "rounded",
+					draw = {
+						treesitter = { "lsp" },
+					},
+				},
 			},
 			appearance = {
 				nerd_font_variant = "mono",
@@ -67,7 +86,10 @@ return {
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer" },
 			},
-			signature = { enabled = true },
+			signature = {
+				enabled = true,
+				window = { border = "rounded" },
+			},
 		},
 		config = function(_, opts)
 			require("nvim-autopairs").setup({})

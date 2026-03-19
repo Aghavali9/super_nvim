@@ -22,6 +22,9 @@ return {
 			shade_terminals = true,
 			persist_size    = true,
 			direction       = "float",
+			-- Launch zsh explicitly; fall back to $SHELL then bash.
+			shell           = vim.fn.executable("zsh") == 1 and "zsh"
+			                  or (vim.env.SHELL and vim.env.SHELL ~= "" and vim.env.SHELL or "bash"),
 			size = function(term)
 				if term.direction == "horizontal" then
 					return 15
