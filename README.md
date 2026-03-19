@@ -52,7 +52,52 @@ A powerful, modern Neovim configuration optimized for multi-language development
 | shellcheck | Bash/sh | `sudo apt install shellcheck` |
 | markdownlint | Markdown | `npm install -g markdownlint-cli` |
 
-## 🚀 Quick Installation
+## 🩺 Provider Setup & Health Checks
+
+Run `:checkhealth` inside Neovim to see the current state of all providers.
+
+### Python provider (`pynvim`)
+
+The config auto-detects `python3` in your PATH and sets `g:python3_host_prog` accordingly. If you prefer a dedicated venv:
+
+```bash
+# Create a venv and install pynvim
+python3 -m venv ~/.local/share/nvim-python
+~/.local/share/nvim-python/bin/pip install pynvim
+
+# Then point Neovim at it (add to lua/config/options.lua):
+# vim.g.python3_host_prog = vim.fn.expand("~/.local/share/nvim-python/bin/python")
+```
+
+To upgrade pynvim to the latest version:
+
+```bash
+pip install --upgrade pynvim
+# or, if using a venv:
+~/.local/share/nvim-python/bin/pip install --upgrade pynvim
+```
+
+### Perl / Ruby providers
+
+These providers are **disabled** in the config (`g:loaded_perl_provider = 0`, `g:loaded_ruby_provider = 0`) because they are not required by any plugin in this configuration. This suppresses the health-check warnings without needing to install additional system packages.
+
+If you ever need the Perl provider:
+```bash
+cpan install Neovim::Ext
+# then remove the vim.g.loaded_perl_provider line from lua/config/options.lua
+```
+
+If you ever need the Ruby provider:
+```bash
+gem install neovim
+# then remove the vim.g.loaded_ruby_provider line from lua/config/options.lua
+```
+
+### Mason / Julia
+
+Mason may warn that the `julia` executable is not found if any Mason-installed tool requires Julia. This config does not install Julia-related packages, so the warning can safely be ignored. Install [Julia](https://julialang.org/downloads/) and add it to your PATH only if you need Julia LSP/tooling.
+
+
 
 ### Automated Installation (Ubuntu/Debian)
 
@@ -293,6 +338,7 @@ The leader key is set to `<Space>`.
 | `<leader>Tv` | Open vertical terminal |
 | `<leader>Tf` | Open floating terminal |
 
+> **Shell**: The terminal prefers **zsh** when available in PATH (falls back to `$SHELL` then `bash` if zsh is not found).  
 > **Tip**: Inside the terminal, use `<C-\>` again to hide it. To return to normal mode without closing, use `<C-\><C-n>` (standard Neovim terminal-mode escape).
 
 ---
@@ -494,9 +540,17 @@ The leader key is set to `<Space>`.
 ### Autocompletion
 | Key | Action |
 |-----|--------|
-| `<Tab>` | Next completion item |
-| `<S-Tab>` | Previous completion item |
-| `<CR>` | Confirm selection |
+| `<Tab>` | Scroll to **next** suggestion (or jump to next snippet placeholder, or indent) |
+| `<S-Tab>` | Scroll to **previous** suggestion (or jump to previous snippet placeholder) |
+| `<CR>` | Accept / confirm the currently highlighted suggestion |
+| `<Up>` / `<Down>` | Navigate the completion list (alternative to Tab/S-Tab) |
+| `<C-Space>` | Manually show completion menu / toggle documentation preview |
+| `<C-e>` | Dismiss completion menu |
+| `<C-b>` / `<C-f>` | Scroll the documentation preview window up/down |
+
+> **Ghost text**: As you type, the currently-selected suggestion is shown as dimmed inline text right after your cursor — you see exactly what will be inserted before pressing `<CR>`. As you scroll through the menu with `<Tab>`/`<S-Tab>`, the ghost text updates to match the highlighted item.  
+> **Preview**: A documentation/signature preview window appears automatically when you highlight a suggestion — no extra keypress needed.  
+> **Snippet jumps**: `<C-k>` / `<C-j>` jump forward/backward through active LuaSnip placeholders (works in both insert and select mode).
 
 ---
 
