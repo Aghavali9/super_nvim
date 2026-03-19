@@ -2,6 +2,14 @@
 -- LSP server management (mason) and nvim-lspconfig
 
 return {
+
+	-- ── Fidget (LSP progress notifications) ───────────────────────────────────
+	{
+		"j-hui/fidget.nvim",
+		event = "LspAttach",
+		opts = {},
+	},
+
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {

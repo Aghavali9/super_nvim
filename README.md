@@ -17,7 +17,7 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **Diagnostics Panel**: `<leader>xx` opens Trouble for project-wide diagnostics
 - **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation, table auto-alignment
 - **Obsidian Integration**: First-class Obsidian vault support with obsidian.nvim
-- **Beautiful UI**: Rose-Pine colorscheme, custom dashboard, and noice.nvim UI overhaul (enhanced messages, command palette, LSP hover borders)
+- **Beautiful UI**: Rose-Pine colorscheme, custom dashboard, and fidget.nvim LSP progress notifications
 
 ## 📋 Prerequisites
 
@@ -112,12 +112,12 @@ bash installer.sh
 - **[nvim-web-devicons](https://github.com/nvim-tree/nvim-web-devicons)** - File type icons (requires a Nerd Font)
 - **[lualine.nvim](https://github.com/nvim-lualine/lualine.nvim)** - Statusline
 - **[alpha-nvim](https://github.com/goolord/alpha-nvim)** - Custom dashboard
-- **[noice.nvim](https://github.com/folke/noice.nvim)** - UI overhaul: floating cmdline, message history, LSP hover borders
-- **[nvim-notify](https://github.com/rcarriga/nvim-notify)** - Animated notification popups (used by noice.nvim)
-- **[nui.nvim](https://github.com/MunifTanjim/nui.nvim)** - UI component library (required by noice.nvim)
 - **[dressing.nvim](https://github.com/stevearc/dressing.nvim)** - Floating input/select UI
 - **[which-key.nvim](https://github.com/folke/which-key.nvim)** - Keymap hint popup
 - **[trouble.nvim](https://github.com/folke/trouble.nvim)** - Project-wide diagnostics list
+
+### LSP Enhancements
+- **[fidget.nvim](https://github.com/j-hui/fidget.nvim)** - LSP progress notifications
 
 ### Formatting
 - **[conform.nvim](https://github.com/stevearc/conform.nvim)** - Format-on-save (stylua, black, clang-format, prettier, shfmt)
@@ -575,7 +575,7 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
     │   └── ui.lua              # Alpha dashboard configuration
     └── plugins/
         ├── init.lua            # (empty — lazy.nvim loads all files in this dir)
-        ├── ui.lua              # Colorscheme, icons, dashboard, lualine, which-key, trouble, noice
+        ├── ui.lua              # Colorscheme, icons, dashboard, lualine, which-key, trouble
         ├── lsp.lua             # mason + nvim-lspconfig
         ├── completion.lua      # blink.cmp + LuaSnip + autopairs
         ├── treesitter.lua      # nvim-treesitter
