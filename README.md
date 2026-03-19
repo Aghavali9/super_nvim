@@ -4,17 +4,23 @@ A powerful, modern Neovim configuration optimized for multi-language development
 
 ## ✨ Features
 
-- **Modern LSP Integration**: Full LSP support for C/C++, Python, Java, Lua, and Bash via Neovim 0.11+ native APIs
+- **Modern LSP Integration**: Full LSP support for C/C++, Python, Java, Lua, and Bash via Neovim 0.11+ native APIs, with per-server tuning
 - **Blazing-Fast Autocompletion**: Intelligent code completion with blink.cmp (Rust-powered)
 - **Syntax Highlighting**: Advanced syntax highlighting via Treesitter
 - **Fuzzy Finding**: Lightning-fast file/text search with Telescope
 - **Git Integration**: Built-in git tools (Fugitive, Gitsigns)
-- **Project Navigation**: Quick file switching with Harpoon
+- **Project Navigation**: Quick file switching with Harpoon; multi-repo project management via project.nvim
 - **Per-Filetype Code Generation**: Buffer-local keymaps in `ftplugin/` for Markdown, Python, Lua, C, C++, and Java — insert skeletons, docstrings, classes, getters/setters, and more without leaving the editor
 - **Rich Snippet Library**: LuaSnip snippets for every supported language
 - **Smart Commenting**: `gcc` / `gc` toggling via Comment.nvim
 - **Surround Pairs**: `ys` / `ds` / `cs` via nvim-surround
 - **Diagnostics Panel**: `<leader>xx` opens Trouble for project-wide diagnostics
+- **Debugging (DAP)**: Full debug adapter stack (`nvim-dap` + `nvim-dap-ui` + mason-managed adapters) for C/C++ and Python
+- **Linting**: Automatic on-save linting with `nvim-lint` for Python, C/C++, Lua, Bash, and Markdown
+- **Testing**: Integrated test runner via `neotest` with pytest/unittest adapter for Python
+- **Session Management**: Per-project session save/restore with `persistence.nvim`
+- **Integrated Terminal**: Floating/split terminal toggle with `toggleterm.nvim`
+- **Keymap Discovery**: `which-key.nvim` popup for all registered keymaps
 - **Markdown Support**: Live preview, beautiful in-editor rendering, interactive table generation, table auto-alignment
 - **Obsidian Integration**: First-class Obsidian vault support with obsidian.nvim
 - **Beautiful UI**: Rose-Pine colorscheme, custom dashboard, and fidget.nvim LSP progress notifications
@@ -30,6 +36,21 @@ A powerful, modern Neovim configuration optimized for multi-language development
 - **Python 3** (for Python LSP)
 - **Java JDK 11+** (for Java LSP / compilation)
 - **A Nerd Font** (optional, for icons and glyphs — e.g. JetBrainsMono or FiraCode Nerd Font)
+
+### Optional: Debugger adapters (installed automatically via Mason)
+| Adapter | Languages | Mason name |
+|---------|-----------|------------|
+| codelldb | C, C++ | `codelldb` |
+| debugpy | Python | `debugpy` |
+
+### Optional: Linters (must be present in PATH)
+| Linter | Language | Install |
+|--------|----------|---------|
+| ruff | Python | `pip install ruff` |
+| cpplint | C/C++ | `pip install cpplint` |
+| luacheck | Lua | `luarocks install luacheck` |
+| shellcheck | Bash/sh | `sudo apt install shellcheck` |
+| markdownlint | Markdown | `npm install -g markdownlint-cli` |
 
 ## 🚀 Quick Installation
 
@@ -84,6 +105,27 @@ bash installer.sh
 - **[mason-lspconfig.nvim](https://github.com/williamboman/mason-lspconfig.nvim)** - Bridge between Mason and nvim-lspconfig
 - **[nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)** - LSP configuration
 - **[plenary.nvim](https://github.com/nvim-lua/plenary.nvim)** - Lua utilities library (required by Telescope and Harpoon)
+
+### Debugging (DAP)
+- **[nvim-dap](https://github.com/mfussenegger/nvim-dap)** - Debug adapter protocol client
+- **[nvim-dap-ui](https://github.com/rcarriga/nvim-dap-ui)** - UI panels for nvim-dap
+- **[nvim-nio](https://github.com/nvim-neotest/nvim-nio)** - Async I/O library (required by nvim-dap-ui)
+- **[mason-nvim-dap.nvim](https://github.com/jay-babu/mason-nvim-dap.nvim)** - Mason-managed debug adapters (codelldb, debugpy)
+
+### Linting
+- **[nvim-lint](https://github.com/mfussenegger/nvim-lint)** - Lightweight linting on BufWritePost / InsertLeave
+
+### Testing
+- **[neotest](https://github.com/nvim-neotest/neotest)** - Extensible test runner framework
+- **[neotest-python](https://github.com/nvim-neotest/neotest-python)** - pytest / unittest adapter
+- **[FixCursorHold.nvim](https://github.com/antoinemadec/FixCursorHold.nvim)** - CursorHold performance fix (required by neotest)
+
+### Session & Project Management
+- **[persistence.nvim](https://github.com/folke/persistence.nvim)** - Per-directory session save/restore
+- **[project.nvim](https://github.com/ahmedkhalf/project.nvim)** - Automatic project root detection + Telescope integration
+
+### Terminal
+- **[toggleterm.nvim](https://github.com/akinsho/toggleterm.nvim)** - Floating / split terminal toggle
 
 ### Completion & Editing
 - **[blink.cmp](https://github.com/Saghen/blink.cmp)** - Blazing-fast autocompletion engine (Rust-powered)
@@ -208,6 +250,69 @@ The leader key is set to `<Space>`.
 | Key | Action |
 |-----|--------|
 | `<leader>r` | Compile and run current file (C, C++, Python, Java) |
+
+---
+
+### Debugging (DAP)
+| Key | Action |
+|-----|--------|
+| `<leader>db` | Toggle breakpoint |
+| `<leader>dB` | Conditional breakpoint (prompt for expression) |
+| `<leader>dc` | Continue / start debug session |
+| `<leader>dn` | Step over |
+| `<leader>di` | Step into |
+| `<leader>do` | Step out |
+| `<leader>dt` | Terminate debug session |
+| `<leader>dr` | Open DAP REPL |
+| `<leader>du` | Toggle DAP UI panels |
+
+> **Note**: DAP adapters are installed automatically by Mason (`codelldb` for C/C++, `debugpy` for Python).  
+> The UI opens automatically when a session initialises and closes when it ends.
+
+---
+
+### Testing (neotest)
+| Key | Action |
+|-----|--------|
+| `<leader>tn` | Run nearest test |
+| `<leader>tf` | Run all tests in current file |
+| `<leader>ts` | Run full test suite (project) |
+| `<leader>to` | Toggle test output panel |
+| `<leader>tS` | Toggle test summary panel |
+| `<leader>tx` | Stop running tests |
+
+> **Note**: Python tests use pytest by default. Install pytest with `pip install pytest`.
+
+---
+
+### Terminal (toggleterm)
+| Key | Action |
+|-----|--------|
+| `<C-\>` | Toggle floating terminal (normal & terminal mode) |
+| `<leader>Th` | Open horizontal terminal |
+| `<leader>Tv` | Open vertical terminal |
+| `<leader>Tf` | Open floating terminal |
+
+> **Tip**: Inside the terminal, use `<C-\>` again to hide it. To return to normal mode without closing, use `<C-\><C-n>` (standard Neovim terminal-mode escape).
+
+---
+
+### Sessions (persistence.nvim)
+| Key | Action |
+|-----|--------|
+| `<leader>Sr` | Restore session for current directory |
+| `<leader>SL` | Restore the last saved session |
+| `<leader>Ss` | Save session manually |
+| `<leader>Sd` | Stop session tracking (won't save on exit) |
+
+---
+
+### Projects
+| Key | Action |
+|-----|--------|
+| `<leader>fp` | Browse/switch projects (Telescope + project.nvim) |
+
+> **Note**: project.nvim auto-detects project roots via `.git`, `CMakeLists.txt`, `pyproject.toml`, `pom.xml`, `package.json`, and similar markers.
 
 ---
 
@@ -483,12 +588,15 @@ mvn test                   # run tests
 ## 🔧 Configuration Details
 
 ### LSP Servers
-The following language servers are pre-configured and auto-installed via Mason:
-- **clangd** - C/C++
-- **pyright** - Python
-- **lua_ls** - Lua
-- **jdtls** - Java
-- **bashls** - Bash / shell scripts
+The following language servers are pre-configured and auto-installed via Mason, with per-server settings:
+
+| Server | Language | Key settings |
+|--------|----------|-------------|
+| clangd | C / C++ | background indexing, clang-tidy, detailed completions |
+| pyright | Python | workspace diagnostics, library code types |
+| lua_ls | Lua | Neovim runtime library, `vim` global recognised |
+| jdtls | Java | Mason-managed, workspace auto-detected |
+| bashls | Bash/sh | covers both `sh` and `bash` filetypes |
 
 ### Treesitter Languages
 Pre-installed syntax support for C, C++, Lua, Python, Java, Bash, Markdown, JSON, YAML, and TOML.
@@ -503,6 +611,27 @@ Automatic formatting is configured for:
 | C / C++ / Java | clang-format |
 | Bash / sh | shfmt |
 | Markdown / JSON / YAML | prettier |
+
+### Linters (nvim-lint)
+Linting runs on `BufWritePost`, `BufReadPost`, and `InsertLeave`. Only linters present in PATH are invoked — missing tools produce no errors.
+
+| Filetype | Linter |
+|----------|--------|
+| Python | ruff |
+| C / C++ | cpplint |
+| Lua | luacheck |
+| Bash / sh | shellcheck |
+| Markdown | markdownlint |
+
+### Performance & Lazy Loading
+All heavy plugins are lazy-loaded:
+- DAP plugins load only when a debug keymap is triggered.
+- neotest loads on test keymaps.
+- toggleterm loads on the first `<C-\>` or `<leader>T*` key.
+- persistence.nvim loads on `BufReadPre` (first real buffer).
+- project.nvim and session keymaps load on `VeryLazy`.
+
+Run `:Lazy profile` inside Neovim to measure startup time and identify hotspots.
 
 ## 🎨 Customization
 
@@ -536,6 +665,26 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
 2. Check LSP status: `:LspInfo`
 3. Restart LSP: `:LspRestart`
 
+### Debugger not working
+1. Check that adapters are installed: `:Mason` → look for `codelldb` / `debugpy`
+2. Verify DAP adapter status: `:lua print(vim.inspect(require("dap").adapters))`
+3. For Python, ensure `debugpy` is installed in your active virtualenv or globally
+
+### Linter not producing diagnostics
+Linters must be present in `$PATH`. Check with `which ruff`, `which shellcheck`, etc.  
+No error is shown for missing linters — they are simply skipped.
+
+### Tests not found
+- Python: make sure `pytest` is installed (`pip install pytest`) and files are named `test_*.py`.
+- Run `:Neotest run` and check the summary panel (`<leader>tS`) for errors.
+
+### Session not restoring
+- Sessions are saved per-directory. Open Neovim from the same directory and press `<leader>Sr`.
+- To stop persistence for a session: `<leader>Sd`.
+
+### Startup performance
+Run `:Lazy profile` to see plugin load times. Plugins with `event = "VeryLazy"` or key-triggered specs should not appear in startup time.
+
 ### Markdown preview not working
 ```vim
 :call mkdp#util#install()
@@ -567,8 +716,9 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
     │   ├── options.lua         # Neovim options & leader key
     │   ├── keymaps.lua         # Global keybindings & Smart Build/Run
     │   ├── autocmds.lua        # LspAttach autocommand (gd, gr, K, …)
-    │   ├── lsp.lua             # LSP capabilities (blink.cmp) & server list
+    │   ├── lsp.lua             # LSP capabilities (blink.cmp), per-server settings & server list
     │   ├── formatting.lua      # conform.nvim format-on-save
+    │   ├── lint.lua            # nvim-lint filetype → linter mapping
     │   ├── snippets.lua        # LuaSnip snippets for all languages
     │   ├── scaffolding.lua     # :CProject / :PyProject / :JavaProject commands
     │   ├── telescope.lua       # Telescope pickers & keymaps
@@ -582,7 +732,12 @@ Create `ftplugin/<filetype>.lua` — Neovim loads it automatically for every buf
         ├── navigation.lua      # telescope + harpoon + oil.nvim
         ├── git.lua             # gitsigns + vim-fugitive
         ├── editing.lua         # conform + undotree + Comment.nvim + nvim-surround
-        └── markdown.lua        # markdown-preview + render-markdown + obsidian.nvim
+        ├── markdown.lua        # markdown-preview + render-markdown + obsidian.nvim
+        ├── dap.lua             # nvim-dap + nvim-dap-ui + mason-nvim-dap (debuggers)
+        ├── lint.lua            # nvim-lint (linting)
+        ├── testing.lua         # neotest + neotest-python (test runner)
+        ├── sessions.lua        # persistence.nvim + project.nvim
+        └── terminal.lua        # toggleterm.nvim (floating/split terminal)
 ```
 
 ## 🤝 Contributing
