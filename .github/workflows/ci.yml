@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Lua formatting check (stylua) ──────────────────────────────────────────
+  lua-fmt:
+    name: Lua Format (stylua)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stylua
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check .
+
+  # ── Lua linting (luacheck) ─────────────────────────────────────────────────
+  lua-lint:
+    name: Lua Lint (luacheck)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install luacheck
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq lua5.1 luarocks
+          sudo luarocks install luacheck
+
+      - name: Run luacheck
+        run: luacheck .
+
+  # ── Neovim headless startup check ─────────────────────────────────────────
+  nvim-startup:
+    name: Neovim Headless Startup
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Run headless startup (skip plugin bootstrap)
+        env:
+          # Point NVIM_APPNAME at the checked-out config directory so Neovim
+          # uses it as the config root without touching the runner's home config.
+          NVIM_APPNAME: super_nvim_ci
+        run: |
+          CONFIG_DIR="${{ github.workspace }}"
+          XDG_CONFIG_HOME="/tmp/ci_xdg_config"
+          mkdir -p "$XDG_CONFIG_HOME/super_nvim_ci"
+          # Symlink the checked-out config so Neovim can find it.
+          # Skip if symlinks already exist (idempotent re-runs).
+          for target in init.lua lua; do
+            src="$CONFIG_DIR/$target"
+            dst="$XDG_CONFIG_HOME/super_nvim_ci/$target"
+            [ -e "$dst" ] || ln -s "$src" "$dst"
+          done
+          # Verify the symlinks were created successfully
+          for target in init.lua lua; do
+            [ -e "$XDG_CONFIG_HOME/super_nvim_ci/$target" ] || { echo "ERROR: symlink missing: $target"; exit 1; }
+          done
+
+          # Boot Neovim headlessly with a minimal no-plugin flag to verify
+          # that the Lua config parses cleanly.  We skip lazy.nvim bootstrapping
+          # by passing --noplugin so the startup check is fast and reproducible.
+          XDG_CONFIG_HOME="$XDG_CONFIG_HOME" nvim \
+            --headless \
+            --noplugin \
+            -u "$CONFIG_DIR/init.lua" \
+            -c "lua require('config.options')" \
+            -c "lua require('config.keymaps')" \
+            -c "lua require('config.autocmds')" \
+            -c "qa!" 2>&1 && echo "Startup OK" || { echo "Startup FAILED"; exit 1; }
