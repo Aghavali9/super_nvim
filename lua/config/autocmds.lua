@@ -6,10 +6,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		-- K: fast, buffer-local LSP hover (takes priority over global mappings;
-		--    does not affect markdown/Obsidian buffers where LspAttach never fires)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "gK", vim.lsp.buf.hover, opts) -- optional: explicit builtin hover alias
+		-- Keep K mapped in lua/plugins/folds.lua (UFO peek + lspsaga/builtin hover fallback)
+		-- vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "gK", vim.lsp.buf.hover, opts) -- opti / onal: direct builtin hover
 		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 		vim.keymap.set("n", "<leader>fd", function()

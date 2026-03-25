@@ -14,17 +14,6 @@ end
 -- Apply capabilities globally to all servers
 vim.lsp.config("*", { capabilities = capabilities })
 
--- ── Hover handler: capped size to reduce verbose overload blobs ───────────────
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-  vim.lsp.handlers.hover,
-  {
-    border     = "rounded",
-    max_width  = 80,
-    max_height = 20,
-    silent     = true,
-  }
-)
-
 -- ── Per-server settings ───────────────────────────────────────────────────────
 
 -- Lua: recognise the `vim` global and Neovim runtime library

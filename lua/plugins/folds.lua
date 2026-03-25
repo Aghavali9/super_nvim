@@ -45,17 +45,23 @@ return {
       vim.keymap.set("n", "zM", require("ufo").closeAllFolds,
         { desc = "Close all folds (UFO)" })
 
-      -- zK ── peek the folded lines under cursor (K is reserved for LSP hover)
-      vim.keymap.set("n", "zK", function()
+      -- K ── peek the folded lines under cursor; fall back to LSP hover doc
+      vim.keymap.set("n", "K", function()
         local winid = require("ufo").peekFoldedLinesUnderCursor()
         if winid then
           last_peek_winid = winid
         else
           last_peek_winid = nil
+          -- prefer lspsaga hover when available, fall back to built-in hover
+          local ok, err = pcall(vim.cmd, "Lspsaga hover_doc")
+          if not ok then
+            vim.notify("hover: " .. tostring(err), vim.log.levels.DEBUG)
+            vim.lsp.buf.hover()
+          end
         end
-      end, { desc = "Peek folded lines (UFO)" })
+      end, { desc = "Peek fold / Hover doc (UFO)" })
 
-      -- KK ── enter the currently-open peek window
+      -- KK ── enter the currently-open peek / hover window
       vim.keymap.set("n", "KK", function()
         if last_peek_winid and vim.api.nvim_win_is_valid(last_peek_winid) then
           vim.api.nvim_set_current_win(last_peek_winid)
@@ -66,7 +72,7 @@ return {
             vim.api.nvim_set_current_win(winid)
           end
         end
-      end, { desc = "Enter peek window (UFO)" })
+      end, { desc = "Enter peek / hover window (UFO)" })
     end,
   },
 }
