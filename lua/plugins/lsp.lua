@@ -8,37 +8,33 @@ return {
 		"j-hui/fidget.nvim",
 		event = "LspAttach",
 		opts = {
-			-- Progress notification display
 			progress = {
-				poll_rate = 0,                -- react to LSP progress events immediately
-				suppress_on_insert = false,   -- show notifications in insert mode too
+				poll_rate = 0,
+				suppress_on_insert = false,
 				ignore_done_already = false,
 				ignore_empty_message = false,
-				-- Notification display settings for LSP progress
 				display = {
-					render_limit = 16,           -- max concurrent notifications
-					done_ttl = 3,                -- seconds to keep a "done" notification
+					render_limit = 16,
+					done_ttl = 3,
 					done_icon = "✔",
 					done_style = "Constant",
-					progress_ttl = math.huge,    -- keep in-progress items until complete
+					progress_ttl = math.huge,
 					progress_icon = { pattern = "dots", period = 1 },
 					progress_style = "WarningMsg",
 					group_style = "Title",
 					icon_style = "Question",
 					priority = 30,
-					skip_history = false,        -- include LSP progress in history
+					skip_history = false,
 				},
 			},
-			-- Notification system (for history, grouping, etc.)
 			notification = {
 				poll_rate = 10,
 				filter = vim.log.levels.INFO,
 				history_size = 128,
-				override_vim_notify = false,   -- keep vim.notify behaviour intact
-				-- Window / float options for notifications
+				override_vim_notify = false,
 				window = {
 					normal_hl = "Comment",
-					winblend = 0,                -- fully opaque
+					winblend = 0,
 					border = "none",
 					zindex = 45,
 					max_width = 0,
@@ -49,7 +45,7 @@ return {
 					relative = "editor",
 				},
 				view = {
-					stack_upwards = true,        -- notifications stack from bottom upward
+					stack_upwards = true,
 					icon_separator = " ",
 					group_separator = "---",
 					group_separator_hl = "Comment",
@@ -59,7 +55,6 @@ return {
 					end,
 				},
 			},
-			-- Logger (leave at warn unless debugging)
 			logger = {
 				level = vim.log.levels.WARN,
 				max_size = 10000,
@@ -96,26 +91,25 @@ return {
 				},
 			})
 
-			-- Rosé Pine-friendly highlights for Lspsaga floating windows
-			local rp_bg   = "#232136"
-			local rp_fg   = "#e0def4"
+			local rp_bg = "#232136"
+			local rp_fg = "#e0def4"
 			local rp_foam = "#9ccfd8"
 			local rp_gold = "#f6c177"
 			local rp_rose = "#ebbcba"
 
 			local function apply_saga_highlights()
-				vim.api.nvim_set_hl(0, "SagaNormal",      { bg = rp_bg,   fg = rp_fg })
-				vim.api.nvim_set_hl(0, "SagaBorder",      { bg = rp_bg,   fg = rp_foam })
-				vim.api.nvim_set_hl(0, "SagaTitle",       { bg = rp_bg,   fg = rp_gold, bold = true })
+				vim.api.nvim_set_hl(0, "SagaNormal", { bg = rp_bg, fg = rp_fg })
+				vim.api.nvim_set_hl(0, "SagaBorder", { bg = rp_bg, fg = rp_foam })
+				vim.api.nvim_set_hl(0, "SagaTitle", { bg = rp_bg, fg = rp_gold, bold = true })
 				vim.api.nvim_set_hl(0, "SagaHoverBorder", { link = "SagaBorder" })
-				vim.api.nvim_set_hl(0, "SagaCodeAction",  { bg = rp_bg,   fg = rp_rose })
+				vim.api.nvim_set_hl(0, "SagaCodeAction", { bg = rp_bg, fg = rp_rose })
 			end
 
 			apply_saga_highlights()
 
 			local saga_hl_group = vim.api.nvim_create_augroup("SagaRosePineHighlights", { clear = true })
 			vim.api.nvim_create_autocmd("ColorScheme", {
-				group   = saga_hl_group,
+				group = saga_hl_group,
 				pattern = "rose-pine*",
 				callback = apply_saga_highlights,
 			})
@@ -131,11 +125,11 @@ return {
 		config = function()
 			require("mason-lspconfig").setup({
 				ensure_installed = {
-					"clangd",    -- C / C++
-					"pyright",   -- Python
-					"lua_ls",    -- Lua
-					"jdtls",     -- Java
-					"bashls",    -- Bash / shell scripts
+					"clangd",
+					"basedpyright",
+					"lua_ls",
+					"jdtls",
+					"bashls",
 				},
 				automatic_installation = true,
 			})

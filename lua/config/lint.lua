@@ -5,12 +5,11 @@
 local lint = require("lint")
 
 lint.linters_by_ft = {
-	python   = { "ruff" },
-	c        = { "cpplint" },
-	cpp      = { "cpplint" },
-	lua      = { "luacheck" },
-	sh       = { "shellcheck" },
-	bash     = { "shellcheck" },
+	python = { "ruff" },
+	c = { "cpplint" },
+	cpp = { "cpplint" },
+	sh = { "shellcheck" },
+	bash = { "shellcheck" },
 	markdown = { "markdownlint" },
 }
 

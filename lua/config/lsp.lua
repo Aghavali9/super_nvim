@@ -1,68 +1,61 @@
 -- lua/config/lsp.lua  (Neovim 0.11+ native LSP)
 
--- Always try to get blink.cmp capabilities so LSP gets full completion support
--- regardless of when blink.cmp was loaded relative to this file.
 local ok, blink = pcall(require, "blink.cmp")
 
 local capabilities
 if ok and blink and type(blink.get_lsp_capabilities) == "function" then
-  capabilities = blink.get_lsp_capabilities()
+	capabilities = blink.get_lsp_capabilities()
 else
-  capabilities = vim.lsp.protocol.make_client_capabilities()
+	capabilities = vim.lsp.protocol.make_client_capabilities()
 end
 
--- Apply capabilities globally to all servers
 vim.lsp.config("*", { capabilities = capabilities })
 
 -- ── Per-server settings ───────────────────────────────────────────────────────
 
--- Lua: recognise the `vim` global and Neovim runtime library
 vim.lsp.config("lua_ls", {
-  settings = {
-    Lua = {
-      runtime  = { version = "LuaJIT" },
-      workspace = {
-        checkThirdParty = false,
-        library        = { vim.env.VIMRUNTIME },
-      },
-      diagnostics = { globals = { "vim" } },
-      telemetry   = { enable = false },
-    },
-  },
+	settings = {
+		Lua = {
+			runtime = { version = "LuaJIT" },
+			workspace = {
+				checkThirdParty = false,
+				library = { vim.env.VIMRUNTIME },
+			},
+			diagnostics = { globals = { "vim" } },
+			telemetry = { enable = false },
+		},
+	},
 })
 
--- Python: workspace-wide analysis, follow imports
-vim.lsp.config("pyright", {
-  settings = {
-    python = {
-      analysis = {
-        autoSearchPaths       = true,
-        useLibraryCodeForTypes = true,
-        diagnosticMode        = "workspace",
-        typeCheckingMode      = "basic",
-      },
-    },
-  },
+vim.lsp.config("basedpyright", {
+	settings = {
+		basedpyright = {
+			analysis = {
+				autoSearchPaths = true,
+				useLibraryCodeForTypes = true,
+				diagnosticMode = "workspace",
+				typeCheckingMode = "standard",
+			},
+		},
+	},
 })
 
--- C/C++: background indexing, clang-tidy integration, detailed completions
 vim.lsp.config("clangd", {
-  cmd = {
-    "clangd",
-    "--background-index",
-    "--clang-tidy",
-    "--completion-style=detailed",
-    "--header-insertion=iwyu",
-  },
+	cmd = {
+		"clangd",
+		"--background-index",
+		"--clang-tidy",
+		"--completion-style=detailed",
+		"--header-insertion=iwyu",
+	},
 })
 
--- Bash: handle both sh and bash filetypes
 vim.lsp.config("bashls", {
-  filetypes = { "sh", "bash" },
+	filetypes = { "sh", "bash" },
 })
 
--- Java (jdtls): rely on mason-installed binary; no extra settings needed here
--- as jdtls handles workspace root and JVM config through mason-lspconfig defaults.
+vim.lsp.enable({ "clangd", "basedpyright", "lua_ls", "jdtls", "bashls" })
 
--- Enable servers (mason-lspconfig ensures they are installed)
-vim.lsp.enable({ "clangd", "pyright", "lua_ls", "jdtls", "bashls" })
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded", max_width = 80 })
+vim.lsp.handlers["textDocument/signatureHelp"] =
+	vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded", max_width = 80 })

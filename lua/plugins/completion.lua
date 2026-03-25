@@ -5,7 +5,6 @@ return {
 	{
 		"saghen/blink.cmp",
 		version = "*",
-		-- Load before InsertEnter so blink capabilities are available to LSP
 		event = { "BufReadPre", "BufNewFile", "InsertEnter" },
 		dependencies = {
 			{
@@ -16,69 +15,62 @@ return {
 				config = function()
 					local luasnip = require("luasnip")
 					require("luasnip.loaders.from_vscode").lazy_load()
-					-- Load custom snippets after LuaSnip is available
-					local ok1, err1 = pcall(require, "custom_snippets")
-					if not ok1 then
-						vim.notify("custom_snippets failed to load: " .. err1, vim.log.levels.WARN)
+
+					local ok1, custom_snips = pcall(require, "custom_snippets")
+					if ok1 and type(custom_snips) == "function" then
+						custom_snips(luasnip)
 					end
 					local ok2, err2 = pcall(require, "config.snippets")
 					if not ok2 then
 						vim.notify("config.snippets failed to load: " .. err2, vim.log.levels.WARN)
 					end
 
-					-- LuaSnip jump keymaps
 					vim.keymap.set({ "i", "s" }, "<C-k>", function()
-						if luasnip.expand_or_jumpable() then luasnip.expand_or_jump() end
+						if luasnip.expand_or_jumpable() then
+							luasnip.expand_or_jump()
+						end
 					end, { silent = true, desc = "Snippet jump forward" })
 
 					vim.keymap.set({ "i", "s" }, "<C-j>", function()
-						if luasnip.jumpable(-1) then luasnip.jump(-1) end
+						if luasnip.jumpable(-1) then
+							luasnip.jump(-1)
+						end
 					end, { silent = true, desc = "Snippet jump backward" })
 				end,
 			},
 			"windwp/nvim-autopairs",
 		},
-		---@module 'blink.cmp'
-		---@type blink.cmp.Config
 		opts = {
 			keymap = {
 				preset = "none",
-				-- Tab / S-Tab: scroll through suggestions when the menu is open;
-				-- when the menu is closed but a snippet is active, jump through
-				-- its placeholders; otherwise fall back to normal Vim tab/indent.
-				["<Tab>"]     = { "select_next", "snippet_forward", "fallback" },
-				["<S-Tab>"]   = { "select_prev", "snippet_backward", "fallback" },
-				-- Accept the currently selected suggestion with Enter.
-				["<CR>"]      = { "accept", "fallback" },
-				-- Arrow keys also navigate (convenience).
-				["<Up>"]      = { "select_prev", "fallback" },
-				["<Down>"]    = { "select_next", "fallback" },
-				-- Show / hide completion and documentation.
+				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+				["<CR>"] = { "accept", "fallback" },
+				["<Up>"] = { "select_prev", "fallback" },
+				["<Down>"] = { "select_next", "fallback" },
 				["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
-				["<C-e>"]     = { "hide", "fallback" },
-				-- Scroll the documentation preview window.
-				["<C-b>"]     = { "scroll_documentation_up", "fallback" },
-				["<C-f>"]     = { "scroll_documentation_down", "fallback" },
+				["<C-e>"] = { "hide", "fallback" },
+				["<C-b>"] = { "scroll_documentation_up", "fallback" },
+				["<C-f>"] = { "scroll_documentation_down", "fallback" },
 			},
 			completion = {
-				-- Show the top suggestion as dimmed ghost text inline in the buffer
-				-- so you can preview exactly what will be inserted before accepting.
 				ghost_text = { enabled = true },
-				-- Automatically show the documentation/preview window when an
-				-- item is highlighted so the user sees docs while scrolling.
 				documentation = {
 					auto_show = true,
-					auto_show_delay_ms = 200,
+					auto_show_delay_ms = 500,
 					window = {
 						border = "rounded",
-						max_width = 80,
+						max_width = 70,
 						max_height = 20,
+						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
 					},
 				},
 				menu = {
 					border = "rounded",
+					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
 					draw = {
 						treesitter = { "lsp" },
+						columns = { { "kind_icon" }, { "label", "label_description", gap = 1 } },
 					},
 				},
 			},
@@ -91,7 +83,11 @@ return {
 			},
 			signature = {
 				enabled = true,
-				window = { border = "rounded" },
+				window = {
+					border = "rounded",
+					show_documentation = true,
+					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+				},
 			},
 		},
 		config = function(_, opts)

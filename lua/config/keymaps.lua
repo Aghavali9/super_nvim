@@ -2,10 +2,14 @@
 
 vim.keymap.set("i", "jk", "<Esc>", { noremap = true, silent = true })
 
-vim.keymap.set("n", "<leader>e", function() require("oil").open() end, { desc = "Explorer (Oil)" })
-vim.keymap.set("n", "-", function() require("oil").open() end, { desc = "Open parent directory (Oil)" })
+vim.keymap.set("n", "<leader>e", function()
+	require("oil").open()
+end, { desc = "Explorer (Oil)" })
+vim.keymap.set("n", "-", function()
+	require("oil").open()
+end, { desc = "Open parent directory (Oil)" })
 vim.keymap.set("n", "<leader>w", ":w<CR>", { desc = "Write" })
-vim.keymap.set("n", "<leader>q", ":q<CR>", { desc = "Quit" })
+vim.keymap.set("n", "<leader>q", ":qa<CR>", { desc = "Quit All" })
 
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
