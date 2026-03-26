@@ -56,6 +56,21 @@ A powerful, modern Neovim configuration optimized for multi-language development
 
 Run `:checkhealth` inside Neovim to see the current state of all providers.
 
+### SuperHealth (quick dependency check)
+
+Run `:SuperHealth` for a fast, at-a-glance report of external tools required by this config:
+
+```
+  [OK]  rg (ripgrep)      — ripgrep 14.1.0
+  [OK]  fd / fdfind       — fd 9.0.0
+ [WARN] node (Node.js)    — not found — install: sudo apt install nodejs
+  [OK]  python3           — Python 3.11.6
+  [OK]  git               — git version 2.42.0
+  ...
+```
+
+Press `q` or `<Esc>` to close the report. For the full built-in diagnostics use `:checkhealth`.
+
 ### Python provider (`pynvim`)
 
 The config auto-detects `python3` in your PATH and sets `g:python3_host_prog` accordingly. If you prefer a dedicated venv:
@@ -554,6 +569,53 @@ The leader key is set to `<Space>`.
 
 ---
 
+## 🗺️ Keymap Design / Collision Policy
+
+Understanding how keymaps are layered helps avoid accidental overlap when adding new bindings.
+
+### Global vs. Buffer-local Precedence
+
+Neovim resolves keymaps in this order (most specific wins):
+
+1. **Buffer-local** (`{ buffer = true }` or `bufnr`) — always takes precedence over global.
+2. **Global** (no buffer qualifier) — applies in all buffers unless overridden.
+
+Buffer-local maps are set in `ftplugin/<filetype>.lua`. Global maps live in `lua/config/keymaps.lua` and inside plugin `keys = {}` specs.
+
+### Reserved Prefixes / Groups
+
+| Prefix | Owner / Group | Notes |
+|--------|---------------|-------|
+| `<leader>f` | Telescope | find files, grep, buffers, diagnostics |
+| `<leader>g` | Git | fugitive, gitsigns |
+| `<leader>d` | DAP (debugging) | breakpoints, run, REPL |
+| `<leader>t` | Testing / neotest | run, summary, output |
+| `<leader>T` | Terminal | toggleterm splits |
+| `<leader>S` | Sessions | save, restore, stop |
+| `<leader>x` | Trouble / quickfix | diagnostics, qflist |
+| `<leader>r` | Run / Build | filetype-aware smart runner |
+| `<leader>rn` | LSP rename | buffer-local, set in LspAttach |
+| `<leader>ca` | LSP code action | buffer-local, set in LspAttach |
+| `<leader>e` / `-` | Oil (explorer) | lazy-loaded on first use |
+| `m*` | ftplugin code-gen | **buffer-local only**, per filetype |
+
+### Naming Conventions for New Keymaps
+
+- **Always** supply a `desc = "..."` string so which-key can display it.
+- Global maps go in `lua/config/keymaps.lua` **or** in the plugin's `keys = {}` lazy spec.
+- Buffer-local maps go in `ftplugin/<filetype>.lua` with `{ buffer = true }`.
+- Use `<leader><prefix><letter>` patterns consistent with the table above.
+- Avoid bare `<F*>` keys unless the feature is universally useful.
+
+### Resolving Conflicts
+
+1. Run `:WhichKey <leader>` to inspect currently registered maps.
+2. Check `lua/config/keymaps.lua` and each `lua/plugins/*.lua` `keys` block.
+3. Buffer-local conflicts: open a file of the relevant type and run `:verbose map <key>`.
+4. If a plugin registers a map you don't want, set `keys = { { "<key>", false } }` in its spec to disable it.
+
+---
+
 ## 🏗️ Project Scaffolding
 
 Three ex-commands are available globally to scaffold new projects from scratch. Run them from inside an **empty directory** in Neovim.
@@ -684,8 +746,70 @@ All heavy plugins are lazy-loaded:
 - toggleterm loads on the first `<C-\>` or `<leader>T*` key.
 - persistence.nvim loads on `BufReadPre` (first real buffer).
 - project.nvim and session keymaps load on `VeryLazy`.
+- oil.nvim loads on first `<leader>e` or `-` keypress.
 
 Run `:Lazy profile` inside Neovim to measure startup time and identify hotspots.
+
+---
+
+## ⚡ Performance Baseline & Lazy-Loading Discipline
+
+### Measuring Startup Time
+
+1. Run `:Lazy profile` — this opens the Lazy profiler tab showing each plugin's load time.
+2. Look for plugins with **load time > 5 ms** that are not triggered by an event/key/command. Those are candidates for stricter lazy-loading.
+3. For a terminal baseline use:
+   ```bash
+   # Average over 5 cold starts (no cached state)
+   for i in $(seq 1 5); do nvim --startuptime /tmp/nvim_startup.log -c 'qa' && tail -1 /tmp/nvim_startup.log; done
+   ```
+
+### Startup Baseline Policy
+
+| Metric | Target |
+|--------|--------|
+| `:Lazy profile` total startup | **< 80 ms** on a modern laptop |
+| Number of plugins loaded at startup | **≤ 5** (colorscheme, icons, dashboard, options, keymaps) |
+| Single plugin startup contribution | Flag anything **> 10 ms** for review |
+
+Track the current baseline in PR descriptions when adding or upgrading plugins.
+
+### Lazy-Loading Rules for New Plugins
+
+Follow this priority order when writing a new plugin spec:
+
+| Trigger | When to use |
+|---------|-------------|
+| `keys = { ... }` | Plugin provides keymaps — **preferred** |
+| `cmd = { "MyCmd" }` | Plugin provides user commands |
+| `ft = { "lua", "python" }` | Plugin is filetype-specific |
+| `event = "BufReadPre"` | Plugin needs to be active for any open file |
+| `event = "VeryLazy"` | UI helpers that are not needed on cold start |
+| `lazy = false` | **Only** for colorscheme, icons, and the dashboard |
+
+**Example — correctly lazy-loaded plugin:**
+```lua
+return {
+  {
+    "author/my-plugin",
+    cmd = { "MyCommand" },   -- only load when :MyCommand is run
+    keys = {
+      { "<leader>mp", "<cmd>MyCommand<cr>", desc = "Run my plugin" },
+    },
+    config = function()
+      require("my-plugin").setup({})
+    end,
+  },
+}
+```
+
+**Anti-pattern to avoid:**
+```lua
+-- BAD: forces eager load on every Neovim startup
+return {
+  { "author/heavy-plugin", lazy = false, config = true },
+}
+```
 
 ## 🎨 Customization
 

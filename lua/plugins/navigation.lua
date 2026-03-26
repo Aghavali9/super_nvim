@@ -7,6 +7,10 @@ return {
 	{
 		"stevearc/oil.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
+		keys = {
+			{ "<leader>e", function() require("oil").open() end, desc = "Explorer (Oil)" },
+			{ "-", function() require("oil").open() end, desc = "Open parent directory (Oil)" },
+		},
 		config = function()
 			require("oil").setup()
 		end,
@@ -26,18 +30,21 @@ return {
 				function()
 					require("telescope.builtin").find_files()
 				end,
+				desc = "Find files",
 			},
 			{
 				"<leader>fg",
 				function()
 					require("telescope.builtin").live_grep()
 				end,
+				desc = "Live grep",
 			},
 			{
 				"<leader>fb",
 				function()
 					require("telescope.builtin").buffers()
 				end,
+				desc = "Find buffers",
 			},
 		},
 		config = function()

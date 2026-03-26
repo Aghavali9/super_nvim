@@ -33,5 +33,6 @@ require("lazy").setup("plugins", {
 require("config.keymaps")
 require("config.autocmds")
 require("config.scaffolding")
+require("config.health")
 -- Note: config.snippets is loaded inside LuaSnip's plugin config callback
 -- (lua/plugins/completion.lua) to ensure LuaSnip is available first.
