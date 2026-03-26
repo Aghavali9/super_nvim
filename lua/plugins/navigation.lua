@@ -6,10 +6,23 @@ return {
 	-- ── Oil (file manager) ────────────────────────────────────────────────────
 	{
 		"stevearc/oil.nvim",
+		lazy = false, -- to prevent lazy-loading from 'keys'
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		keys = {
-			{ "<leader>e", function() require("oil").open() end, desc = "Explorer (Oil)" },
-			{ "-", function() require("oil").open() end, desc = "Open parent directory (Oil)" },
+			{
+				"<leader>e",
+				function()
+					require("oil").open()
+				end,
+				desc = "Explorer (Oil)",
+			},
+			{
+				"-",
+				function()
+					require("oil").open()
+				end,
+				desc = "Open parent directory (Oil)",
+			},
 		},
 		config = function()
 			require("oil").setup()
