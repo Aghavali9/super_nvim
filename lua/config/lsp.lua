@@ -8,6 +8,10 @@ if ok and blink and type(blink.get_lsp_capabilities) == "function" then
 else
 	capabilities = vim.lsp.protocol.make_client_capabilities()
 end
+capabilities.textDocument.foldingRange = {
+	dynamicRegistration = false,
+	lineFoldingOnly = true,
+}
 
 vim.lsp.config("*", { capabilities = capabilities })
 

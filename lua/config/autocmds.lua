@@ -7,7 +7,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts) -- last change here
 
 		if client and client.server_capabilities.renameProvider then
 			vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)

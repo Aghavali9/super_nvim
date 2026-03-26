@@ -85,7 +85,9 @@ return {
 				enabled = true,
 				window = {
 					border = "rounded",
-					show_documentation = true,
+					show_documentation = false, -- to stop the bloat, TODO:
+					max_width = 80,
+					max_height = 15,
 					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
 				},
 			},

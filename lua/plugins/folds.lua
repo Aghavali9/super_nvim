@@ -18,8 +18,18 @@ return {
 			local last_peek_winid = nil
 
 			require("ufo").setup({
-				provider_selector = function(_, _, _)
-					return { "treesitter", "indent" }
+				provider_selector = function(bufnr, filetype, buftype)
+					return function(bufnr)
+						local ufo = require("ufo")
+
+						return ufo.getFolds(bufnr, "lsp")
+							:catch(function(err)
+								return ufo.getFolds(bufnr, "treesitter")
+							end)
+							:catch(function(err)
+								return ufo.getFolds(bufnr, "indent")
+							end)
+					end
 				end,
 				preview = {
 					win_config = {
