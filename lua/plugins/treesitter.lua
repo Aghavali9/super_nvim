@@ -7,15 +7,19 @@ return {
 		build = ":TSUpdate",
 		event = { "BufReadPost", "BufNewFile" },
 		config = function()
-			require("nvim-treesitter.config").setup({
+			require("nvim-treesitter.config").setup({ -- Last change here
 				ensure_installed = {
-					"c", "cpp",
+					"c",
+					"cpp",
 					"python",
 					"lua",
 					"java",
 					"bash",
-					"markdown", "markdown_inline",
-					"json", "yaml", "toml",
+					"markdown",
+					"markdown_inline",
+					"json",
+					"yaml",
+					"toml",
 				},
 				highlight = { enable = true },
 				indent = { enable = true },

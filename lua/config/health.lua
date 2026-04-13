@@ -91,7 +91,11 @@ local function run_checks()
 
 	-- Node.js (required by several LSP servers / Mason tools)
 	local node_ok, node_ver = check_exe("node")
-	add(node_ok and "ok" or "fail", "node (Node.js)", node_ok and node_ver or "not found — install: sudo apt install nodejs")
+	add(
+		node_ok and "ok" or "fail",
+		"node (Node.js)",
+		node_ok and node_ver or "not found — install: sudo apt install nodejs"
+	)
 
 	-- Python 3 (Python LSP / DAP / pynvim provider)
 	local py_ok, py_ver = check_exe("python3")
@@ -105,29 +109,57 @@ local function run_checks()
 
 	-- gcc / clang (C/C++ compilation)
 	local cc_ok, cc_info = check_any({ "gcc", "clang" })
-	add(cc_ok and "ok" or "warn", "gcc / clang (C/C++)", cc_ok and cc_info or "not found — install: sudo apt install build-essential")
+	add(
+		cc_ok and "ok" or "warn",
+		"gcc / clang (C/C++)",
+		cc_ok and cc_info or "not found — install: sudo apt install build-essential"
+	)
 
 	-- Java
 	local java_ok, java_ver = check_exe("java")
-	add(java_ok and "ok" or "warn", "java", java_ok and java_ver or "not found — install: sudo apt install default-jdk")
+	add(
+		java_ok and "ok" or "warn",
+		"java",
+		java_ok and java_ver or "not found — install: sudo apt install default-jdk"
+	)
 
 	-- lazygit (optional git TUI)
 	local lg_ok, lg_ver = check_exe("lazygit")
-	add(lg_ok and "ok" or "warn", "lazygit (optional)", lg_ok and lg_ver or "not found — see: https://github.com/jesseduffield/lazygit")
+	add(
+		lg_ok and "ok" or "warn",
+		"lazygit (optional)",
+		lg_ok and lg_ver or "not found — see: https://github.com/jesseduffield/lazygit"
+	)
 
 	-- Formatters ---------------------------------------------------------------
 	local stylua_ok, stylua_ver = check_exe("stylua")
-	add(stylua_ok and "ok" or "warn", "stylua (Lua formatter)", stylua_ok and stylua_ver or "not found — install: cargo install stylua")
+	add(
+		stylua_ok and "ok" or "warn",
+		"stylua (Lua formatter)",
+		stylua_ok and stylua_ver or "not found — install: cargo install stylua"
+	)
 
 	local black_ok, _ = check_exe("black")
-	add(black_ok and "ok" or "warn", "black (Python formatter)", black_ok and "found" or "not found — install: pip install black")
+	add(
+		black_ok and "ok" or "warn",
+		"black (Python formatter)",
+		black_ok and "found" or "not found — install: pip install black"
+	)
 
 	-- Linters ------------------------------------------------------------------
 	local luacheck_ok, _ = check_exe("luacheck")
-	add(luacheck_ok and "ok" or "warn", "luacheck (Lua linter)", luacheck_ok and "found" or "not found — install: luarocks install luacheck")
+	add(
+		luacheck_ok and "ok" or "warn",
+		"luacheck (Lua linter)",
+		luacheck_ok and "found" or "not found — install: luarocks install luacheck"
+	)
 
 	local shellcheck_ok, _ = check_exe("shellcheck")
-	add(shellcheck_ok and "ok" or "warn", "shellcheck (Bash linter)", shellcheck_ok and "found" or "not found — install: sudo apt install shellcheck")
+	add(
+		shellcheck_ok and "ok" or "warn",
+		"shellcheck (Bash linter)",
+		shellcheck_ok and "found" or "not found — install: sudo apt install shellcheck"
+	)
 
 	-- pynvim provider ----------------------------------------------------------
 	local py_provider = vim.g.python3_host_prog or vim.fn.exepath("python3")
@@ -146,7 +178,11 @@ local function run_checks()
 	local nvim_ver = vim.version()
 	local ver_str = string.format("v%d.%d.%d", nvim_ver.major, nvim_ver.minor, nvim_ver.patch)
 	local ver_ok = (nvim_ver.major == 0 and nvim_ver.minor >= 11) or nvim_ver.major >= 1
-	add(ver_ok and "ok" or "fail", "Neovim " .. ver_str, ver_ok and "meets minimum requirement (0.11+)" or "upgrade required — minimum: 0.11")
+	add(
+		ver_ok and "ok" or "fail",
+		"Neovim " .. ver_str,
+		ver_ok and "meets minimum requirement (0.11+)" or "upgrade required — minimum: 0.11"
+	)
 
 	return entries
 end
@@ -191,5 +227,7 @@ end
 vim.api.nvim_create_user_command("SuperHealth", function()
 	M.run()
 end, { desc = "Show super_nvim dependency / runtime health" })
+
+M.check = M.run -- So :checkhealth doesn't crash
 
 return M

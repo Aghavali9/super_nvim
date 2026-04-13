@@ -22,6 +22,10 @@ return {
 			require("nvim-web-devicons").setup({ default = true })
 		end,
 	},
+	{
+		"echasnovski/mini.icons",
+		version = false,
+	},
 
 	-- ── Dashboard ─────────────────────────────────────────────────────────────
 	{
