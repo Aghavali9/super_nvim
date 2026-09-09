@@ -1,25 +1,6 @@
 # BAT-VIM - Super Neovim Configuration
 
-BAT-VIM is a modular Neovim configuration for Neovim 0.11.3 and newer. This edition keeps the newer safety and runtime improvements while restoring the original BAT-VIM dashboard identity.
-
-The configuration includes:
-
-- Alpha dashboard with the BAT-VIM ASCII header
-- Persistent theme selection
-- Telescope search and project navigation
-- Oil file management
-- Harpoon quick file marks
-- Native Neovim LSP with Mason-managed servers
-- Blink completion and LuaSnip snippets
-- Conform formatting and nvim-lint linting
-- nvim-dap debugging
-- neotest test running
-- ToggleTerm terminals
-- Persistent sessions
-- UFO code folding
-- C, C++, Python, Java, Lua, Shell, Markdown, JSON, and YAML tooling
-- Current-file run commands for C, C++, Python, Java, shell scripts, and Lua
-- Safe project scaffolding commands for C, Python, and Java
+BAT-VIM is a modular Neovim configuration for Neovim 0.11.3 and newer. 
 
 The default installer uses `NVIM_APPNAME=super_nvim`, which allows BAT-VIM to live beside an existing Neovim configuration instead of replacing it.
 
