@@ -1265,20 +1265,3 @@ python3 tests/installer_test.py
 NVIM_APPNAME=super_nvim nvim --headless '+lua dofile("tests/startup.lua")'
 ```
 
-The authoring environment for the refined package did not perform a full interactive plugin integration session, so real debugger sessions, parser compilation, language servers, and external tools should still be validated on the machine where BAT-VIM is installed.
-
-## Notes about the restored BAT-VIM branding
-
-The refined edition temporarily replaced the BAT-VIM ASCII dashboard with a compact Super Nvim heading. This package restores the original BAT-VIM header and BAT-VIM naming in the user-facing startup experience while preserving the newer fixes:
-
-- isolated and safer installation
-- persistent theme menu
-- current-file source runner with no target prompt
-- corrected formatting configuration
-- safer project scaffolding
-- improved completion behavior
-- updated LSP mapping behavior
-- improved dependency health checks
-- test coverage and validation files
-
-The technical installer application name remains `super_nvim` so existing isolated installs and paths remain compatible.
