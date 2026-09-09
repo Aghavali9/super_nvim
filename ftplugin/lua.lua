@@ -5,13 +5,13 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
 	wk.add({
-		{ "<leader>m", group = "Lua", buffer = 0 }, -- last change here
+		{ "<leader>m", group = "Lua", buffer = 0 },
 	})
 end
 
 -- <leader>mr — source (reload) the current Lua file inside Neovim
 vim.keymap.set("n", "<leader>mr", function()
-	vim.cmd("luafile %")
+	vim.cmd.luafile(vim.fn.fnameescape(vim.api.nvim_buf_get_name(0)))
 	vim.notify("Sourced: " .. vim.fn.expand("%:t"), vim.log.levels.INFO)
 end, { buffer = true, desc = "Lua: source current file" })
 

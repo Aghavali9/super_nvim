@@ -11,7 +11,7 @@ return {
 		keys = {
 			-- The open_mapping below also covers <C-\> globally,
 			-- but listing it here ensures lazy.nvim knows when to load the plugin.
-			{ [[<C-\>]],    "<cmd>ToggleTerm<cr>",                        mode = { "n", "t" }, desc = "Terminal: Toggle" },
+			{ [[<C-\>]],    "<cmd>ToggleTerm<cr>",                        mode = { "n", "i", "t" }, desc = "Terminal: Toggle" },
 			{ "<leader>Th", "<cmd>ToggleTerm direction=horizontal<cr>",   desc = "Terminal: Horizontal" },
 			{ "<leader>Tv", "<cmd>ToggleTerm direction=vertical<cr>",     desc = "Terminal: Vertical" },
 			{ "<leader>Tf", "<cmd>ToggleTerm direction=float<cr>",        desc = "Terminal: Float" },
@@ -22,9 +22,7 @@ return {
 			shade_terminals = true,
 			persist_size    = true,
 			direction       = "float",
-			-- Launch zsh explicitly; fall back to $SHELL then bash.
-			shell           = vim.fn.executable("zsh") == 1 and "zsh"
-			                  or (vim.env.SHELL and vim.env.SHELL ~= "" and vim.env.SHELL or "bash"),
+			shell = vim.o.shell,
 			size = function(term)
 				if term.direction == "horizontal" then
 					return 15

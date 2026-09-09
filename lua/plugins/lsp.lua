@@ -91,36 +91,25 @@ return {
 				},
 			})
 
-			local rp_bg = "#232136"
-			local rp_fg = "#e0def4"
-			local rp_foam = "#9ccfd8"
-			local rp_gold = "#f6c177"
-			local rp_rose = "#ebbcba"
-
 			local function apply_saga_highlights()
-				vim.api.nvim_set_hl(0, "SagaNormal", { bg = rp_bg, fg = rp_fg })
-				vim.api.nvim_set_hl(0, "SagaBorder", { bg = rp_bg, fg = rp_foam })
-				vim.api.nvim_set_hl(0, "SagaTitle", { bg = rp_bg, fg = rp_gold, bold = true })
-				vim.api.nvim_set_hl(0, "SagaHoverBorder", { link = "SagaBorder" })
-				vim.api.nvim_set_hl(0, "SagaCodeAction", { bg = rp_bg, fg = rp_rose })
-			end
-
-			apply_saga_highlights()
-
-			local saga_hl_group = vim.api.nvim_create_augroup("SagaRosePineHighlights", { clear = true })
-			vim.api.nvim_create_autocmd("ColorScheme", {
-				group = saga_hl_group,
-				pattern = "rose-pine*",
-				callback = apply_saga_highlights,
-			})
+                for group, target in pairs({ SagaNormal = "NormalFloat", SagaBorder = "FloatBorder",
+                    SagaTitle = "Title", SagaHoverBorder = "FloatBorder", SagaCodeAction = "NormalFloat" }) do
+                    vim.api.nvim_set_hl(0, group, { link = target })
+                end
+            end
+            apply_saga_highlights()
+            vim.api.nvim_create_autocmd("ColorScheme", {
+                group = vim.api.nvim_create_augroup("SuperSagaHighlights", { clear = true }),
+                callback = apply_saga_highlights,
+            })
 		end,
 	},
 
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
-			{ "williamboman/mason.nvim", config = true },
-			{ "williamboman/mason-lspconfig.nvim" },
+			{ "mason-org/mason.nvim", config = true },
+			{ "mason-org/mason-lspconfig.nvim" },
 		},
 		config = function()
 			require("mason-lspconfig").setup({
@@ -131,7 +120,7 @@ return {
 					"jdtls",
 					"bashls",
 				},
-				automatic_installation = true,
+				automatic_enable = false, -- config.lsp owns enablement
 			})
 			require("config.lsp")
 		end,

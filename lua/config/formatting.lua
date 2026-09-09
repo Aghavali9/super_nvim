@@ -1,19 +1,11 @@
--- lua/config/formatting.lua
-
 require("conform").setup({
-  formatters_by_ft = {
-    lua      = { "stylua" },
-    python   = { "black" },
-    c        = { "clang-format" },
-    cpp      = { "clang-format" },
-    java     = { "clang-format" },
-    sh       = { "shfmt" },
-    bash     = { "shfmt" },
-    markdown = { "prettier" },
-    json     = { "prettier" },
-    yaml     = { "prettier" },
-  },
-  format_on_save = function(bufnr)
-    return { timeout_ms = 2000, lsp_fallback = true, bufnr = bufnr }
-  end,
+    formatters_by_ft = {
+        lua = { "stylua" }, python = { "black" }, c = { "clang_format" }, cpp = { "clang_format" },
+        java = { "clang_format" }, sh = { "shfmt" }, bash = { "shfmt" },
+        markdown = { "prettier" }, json = { "prettier" }, yaml = { "prettier" },
+    },
+    format_on_save = function(buf)
+        if vim.g.disable_autoformat or vim.b[buf].disable_autoformat or vim.bo[buf].buftype ~= "" then return end
+        return { timeout_ms = 800, lsp_format = "fallback" }
+    end,
 })

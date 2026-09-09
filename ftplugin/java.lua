@@ -5,7 +5,7 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
 	wk.add({
-		{ "<leader>m", group = "Java", buffer = 0 }, -- last change here
+		{ "<leader>m", group = "Java", buffer = 0 },
 	})
 end
 

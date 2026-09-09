@@ -54,6 +54,7 @@ return {
 				["<C-f>"] = { "scroll_documentation_down", "fallback" },
 			},
 			completion = {
+                list = { selection = { preselect = false, auto_insert = false } },
 				ghost_text = { enabled = true },
 				documentation = {
 					auto_show = true,
@@ -85,7 +86,7 @@ return {
 				enabled = true,
 				window = {
 					border = "rounded",
-					show_documentation = false, -- to stop the bloat, TODO:
+					show_documentation = false, -- keep signature popups compact
 					max_width = 80,
 					max_height = 15,
 					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",

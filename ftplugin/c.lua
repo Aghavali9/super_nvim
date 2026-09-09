@@ -5,18 +5,18 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
 	wk.add({
-		{ "<leader>m", group = "C", buffer = 0 }, -- last change here: true -> 0
+		{ "<leader>m", group = "C", buffer = 0 },
 	})
 end
 
 -- <leader>mh — insert (or update) an include-guard for the current header file
 vim.keymap.set("n", "<leader>mh", function()
-	local fname = vim.fn.expand("%:t"):upper():gsub("[%.%-%s]", "_")
-	local guard = fname .. "_H"
+	local fname = vim.fn.expand("%:t"):upper():gsub("[^%w_]", "_")
+	local guard = "SUPER_" .. fname .. "_INCLUDED"
 	local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
 
 	-- If guard already present, inform and bail out
-	if #lines > 0 and lines[1]:find("#ifndef", 1, true) then
+	if table.concat(lines, "\n"):match("#%s*ifndef") or table.concat(lines, "\n"):match("#%s*pragma%s+once") then
 		vim.notify("Include guard already present", vim.log.levels.WARN)
 		return
 	end
@@ -32,8 +32,8 @@ vim.keymap.set("n", "<leader>mh", function()
 	}
 
 	-- Prepend header and append footer
-	for i, line in ipairs(lines) do
-		header[#header + i] = line
+	for _, line in ipairs(lines) do
+		header[#header + 1] = line
 	end
 	for _, line in ipairs(footer) do
 		header[#header + 1] = line

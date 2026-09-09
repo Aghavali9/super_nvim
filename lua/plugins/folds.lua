@@ -21,7 +21,7 @@ return {
 				local newVirtText = {}
 				local suffix = (" 󰁂 %d lines "):format(endLnum - lnum)
 				local sufWidth = vim.fn.strdisplaywidth(suffix)
-				local targetWidth = width - sufWidth
+				local targetWidth = math.max(0, width - sufWidth)
 				local curWidth = 0
 				for _, chunk in ipairs(virtText) do
 					local chunkText = chunk[1]
@@ -89,6 +89,7 @@ return {
 					last_peek_winid = winid
 				else
 					last_peek_winid = nil
+                    vim.lsp.buf.hover({ border = "rounded", max_width = 80 })
 				end
 			end)
 

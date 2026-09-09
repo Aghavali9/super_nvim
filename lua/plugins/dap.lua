@@ -8,6 +8,7 @@ return {
 	{
 		"mfussenegger/nvim-dap",
 		lazy = true,
+        dependencies = { "rcarriga/nvim-dap-ui", "jay-babu/mason-nvim-dap.nvim" },
 		keys = {
 			{ "<leader>db", function() require("dap").toggle_breakpoint() end,              desc = "DAP: Toggle Breakpoint" },
 			{ "<leader>dB", function() require("dap").set_breakpoint(vim.fn.input("Condition: ")) end, desc = "DAP: Conditional Breakpoint" },
@@ -24,7 +25,6 @@ return {
 	{
 		"rcarriga/nvim-dap-ui",
 		dependencies = {
-			"mfussenegger/nvim-dap",
 			"nvim-neotest/nvim-nio",
 		},
 		keys = {
@@ -45,15 +45,14 @@ return {
 	-- ── Mason-managed debugger installations ──────────────────────────────────
 	{
 		"jay-babu/mason-nvim-dap.nvim",
-		event = "VeryLazy",
+        lazy = true,
 		dependencies = {
-			"williamboman/mason.nvim",
-			"mfussenegger/nvim-dap",
+			"mason-org/mason.nvim",
 		},
 		config = function()
 			require("mason-nvim-dap").setup({
 				-- codelldb for C/C++, debugpy for Python
-				ensure_installed     = { "codelldb", "debugpy" },
+				ensure_installed     = { "codelldb", "python" },
 				automatic_installation = true,
 				-- Default handlers configure adapters automatically
 				handlers             = {},

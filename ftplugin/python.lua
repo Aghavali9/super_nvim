@@ -5,33 +5,26 @@
 local ok, wk = pcall(require, "which-key")
 if ok then
 	wk.add({
-		{ "<leader>m", group = "Python", buffer = 0 }, -- last change here
+		{ "<leader>m", group = "Python", buffer = 0 },
 	})
 end
 
 -- ── Run & Test ───────────────────────────────────────────────────────────────
 
--- <leader>mt — run pytest for the project (or the current file as fallback)
 vim.keymap.set("n", "<leader>mt", function()
-	local cmd
-	if vim.fn.filereadable("pyproject.toml") == 1 or vim.fn.filereadable("setup.py") == 1 then
-		cmd = "python3 -m pytest -v"
-	else
-		cmd = "python3 -m pytest -v " .. vim.fn.expand("%")
-	end
-	vim.cmd("belowright split | resize 15 | terminal " .. cmd)
-end, { buffer = true, desc = "Python: run pytest" })
+    local r = require("config.runner")
+    r.terminal({ r.python(r.root()), "-m", "pytest", "-v" }, r.root())
+end, { buffer = true, desc = "Python: project tests" })
 
--- <leader>mv — create / activate a .venv virtual environment
 vim.keymap.set("n", "<leader>mv", function()
-	local cmd
-	if vim.fn.isdirectory(".venv") == 1 then
-		cmd = "source .venv/bin/activate && echo 'venv activated'"
-	else
-		cmd = "python3 -m venv .venv && echo 'venv created — run: source .venv/bin/activate'"
-	end
-	vim.cmd("belowright split | resize 8 | terminal " .. cmd)
-end, { buffer = true, desc = "Python: create/activate venv" })
+    local r = require("config.runner")
+    local root = r.root()
+    if vim.fn.isdirectory(root .. "/.venv") == 1 then
+        vim.notify("Runner interpreter: " .. r.python(root) .. " (restart LSP after environment changes)")
+    else
+        r.terminal({ "python3", "-m", "venv", root .. "/.venv" }, root)
+    end
+end, { buffer = true, desc = "Python: create / inspect project venv" })
 
 -- ── Code-generation ──────────────────────────────────────────────────────────
 

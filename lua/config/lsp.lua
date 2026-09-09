@@ -60,16 +60,3 @@ vim.lsp.config("bashls", {
 
 vim.lsp.enable({ "clangd", "basedpyright", "lua_ls", "jdtls", "bashls" })
 
-vim.lsp.handlers["textDocument/hover"] = function(err, result, ctx, config)
-	config = config or {}
-	config.border = "rounded"
-	config.max_width = 80
-	return vim.lsp.handlers.hover(err, result, ctx, config)
-end
-
-vim.lsp.handlers["textDocument/signatureHelp"] = function(err, result, ctx, config)
-	config = config or {}
-	config.border = "rounded"
-	config.max_width = 80
-	return vim.lsp.handlers.signature_help(err, result, ctx, config)
-end

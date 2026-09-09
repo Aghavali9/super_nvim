@@ -7,6 +7,15 @@ return {
 	{
 		"stevearc/conform.nvim",
 		event = "BufWritePre",
+        cmd = "ConformInfo",
+        keys = {
+            { "<leader>cf", function() require("conform").format({ async = true, lsp_format = "fallback" }) end,
+                mode = { "n", "v" }, desc = "Format buffer / selection" },
+            { "<leader>cF", function()
+                vim.g.disable_autoformat = not vim.g.disable_autoformat
+                vim.notify("Format on save: " .. (vim.g.disable_autoformat and "off" or "on"))
+            end, desc = "Toggle format on save" },
+        },
 		config = function()
 			require("config.formatting")
 		end,

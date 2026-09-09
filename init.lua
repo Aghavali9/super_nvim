@@ -1,6 +1,10 @@
 -- =============================================================================
---  NEOVIM v0.11+ CONFIGURATION (The "Mammad" Edition) — lazy.nvim edition
+--  BAT-VIM - refined edition (Neovim 0.11.3+, lazy.nvim)
 -- =============================================================================
+
+if vim.fn.has("nvim-0.11.3") == 0 then
+  error("BAT-VIM requires Neovim 0.11.3 or newer")
+end
 
 -- Options (sets mapleader before lazy bootstrap)
 require("config.options")
@@ -18,7 +22,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
       { out, "Warn" },
       { "\nPress any key to continue...", "MoreMsg" },
     }, true, {})
-    vim.fn.getchar()
+    if #vim.api.nvim_list_uis() > 0 then vim.fn.getchar() end
     os.exit(1)
   end
 end
@@ -34,5 +38,6 @@ require("config.keymaps")
 require("config.autocmds")
 require("config.scaffolding")
 require("config.health")
+require("config.theme").commands()
 -- Note: config.snippets is loaded inside LuaSnip's plugin config callback
 -- (lua/plugins/completion.lua) to ensure LuaSnip is available first.

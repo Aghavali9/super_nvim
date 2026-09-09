@@ -15,12 +15,7 @@ local function check_exe(cmd)
 	if path == "" then
 		return false, ""
 	end
-	-- Try to get a version string; fall back to the path on failure.
-	local ok, result = pcall(function()
-		return vim.fn.system({ cmd, "--version" })
-	end)
-	local version = (ok and result or ""):match("([^\n]+)") or path
-	return true, version
+	return true, path
 end
 
 --- Try a list of candidate executables and return the first found.
@@ -52,7 +47,7 @@ local FAIL = " [FAIL] "
 local function render(entries)
 	local lines = {
 		"",
-		"  SuperHealth — dependency / runtime status",
+		"  BAT-VIM Health - dependency / runtime status",
 		"  ==========================================",
 		"",
 	}
@@ -104,6 +99,18 @@ local function run_checks()
 	-- git (plugin manager + version control)
 	local git_ok, git_ver = check_exe("git")
 	add(git_ok and "ok" or "fail", "git", git_ok and git_ver or "not found — install: sudo apt install git")
+
+	-- Active shell -------------------------------------------------------------
+	local shell = vim.o.shell
+	local shell_ok = shell ~= "" and vim.fn.executable(shell) == 1
+	add(shell_ok and "ok" or "warn", "Neovim terminal shell", shell_ok and shell or "configured shell is not executable: " .. tostring(shell))
+
+	-- Neovim 0.12 nvim-treesitter main uses the tree-sitter CLI to install/update parsers.
+	if vim.fn.has("nvim-0.12") == 1 then
+		local ts_ok, ts_path = check_exe("tree-sitter")
+		add(ts_ok and "ok" or "warn", "tree-sitter CLI (Neovim 0.12 parser management)",
+			ts_ok and ts_path or "not found - required to install/update non-bundled parsers with nvim-treesitter main")
+	end
 
 	-- Optional / language toolchains -------------------------------------------
 
@@ -161,27 +168,14 @@ local function run_checks()
 		shellcheck_ok and "found" or "not found — install: sudo apt install shellcheck"
 	)
 
-	-- pynvim provider ----------------------------------------------------------
-	local py_provider = vim.g.python3_host_prog or vim.fn.exepath("python3")
-	if py_provider ~= "" then
-		local pynvim_check = vim.fn.system({ py_provider, "-c", "import pynvim; print('pynvim', pynvim.__version__)" })
-		if vim.v.shell_error == 0 then
-			add("ok", "pynvim provider", pynvim_check:match("([^\n]+)") or "installed")
-		else
-			add("warn", "pynvim provider", "not installed — run: pip install pynvim")
-		end
-	else
-		add("warn", "pynvim provider", "python3 not found — provider unavailable")
-	end
-
 	-- Neovim version -----------------------------------------------------------
 	local nvim_ver = vim.version()
 	local ver_str = string.format("v%d.%d.%d", nvim_ver.major, nvim_ver.minor, nvim_ver.patch)
-	local ver_ok = (nvim_ver.major == 0 and nvim_ver.minor >= 11) or nvim_ver.major >= 1
+	local ver_ok = vim.fn.has("nvim-0.11.3") == 1
 	add(
 		ver_ok and "ok" or "fail",
 		"Neovim " .. ver_str,
-		ver_ok and "meets minimum requirement (0.11+)" or "upgrade required — minimum: 0.11"
+		ver_ok and "meets minimum requirement (0.11.3+)" or "upgrade required — minimum: 0.11.3"
 	)
 
 	return entries
@@ -199,8 +193,8 @@ function M.run()
 	vim.bo[buf].modifiable = false
 	vim.bo[buf].filetype = "superhealth"
 
-	local width = 72
-	local height = math.min(#lines + 2, math.floor(vim.o.lines * 0.8))
+	local width = math.max(1, math.min(72, vim.o.columns - 4))
+	local height = math.max(1, math.min(#lines + 2, vim.o.lines - 4))
 	local row = math.floor((vim.o.lines - height) / 2)
 	local col = math.floor((vim.o.columns - width) / 2)
 
@@ -212,7 +206,7 @@ function M.run()
 		col = col,
 		style = "minimal",
 		border = "rounded",
-		title = " SuperHealth ",
+		title = " BAT-VIM Health ",
 		title_pos = "center",
 	})
 	vim.wo[win].wrap = false
@@ -228,6 +222,25 @@ vim.api.nvim_create_user_command("SuperHealth", function()
 	M.run()
 end, { desc = "Show super_nvim dependency / runtime health" })
 
-M.check = M.run -- So :checkhealth doesn't crash
+-- Neovim discovers lua/*/health.lua automatically when :checkhealth runs.
+-- A health provider must report through vim.health; it must not open/switch
+-- buffers or windows, because :checkhealth owns its report buffer.
+function M.check()
+	local entries = run_checks()
+	vim.health.start("BAT-VIM")
+	for _, entry in ipairs(entries) do
+		local message = entry.label
+		if entry.detail ~= "" then
+			message = message .. ": " .. entry.detail
+		end
+		if entry.status == "ok" then
+			vim.health.ok(message)
+		elseif entry.status == "warn" then
+			vim.health.warn(message)
+		else
+			vim.health.error(message)
+		end
+	end
+end
 
 return M

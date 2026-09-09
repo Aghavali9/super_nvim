@@ -59,6 +59,7 @@ return {
 					"build.gradle",
 				},
 				silent_chdir = true,
+                manual_mode = true, -- never change cwd behind the user
 			})
 			-- Expose the :Telescope projects picker when Telescope is loaded
 			pcall(function()
