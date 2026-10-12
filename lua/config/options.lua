@@ -8,15 +8,15 @@ vim.g.have_nerd_font = true
 -- BATVIM_SHELL=/path/to/shell if you want something else.
 local _shell = vim.env.BATVIM_SHELL
 if not _shell or _shell == "" or vim.fn.executable(_shell) ~= 1 then
-  local _zsh = vim.fn.exepath("zsh")
-  if _zsh ~= "" then
-    _shell = _zsh
-  elseif vim.env.SHELL and vim.env.SHELL ~= "" and vim.fn.executable(vim.env.SHELL) == 1 then
-    _shell = vim.env.SHELL
-  end
+	local _zsh = vim.fn.exepath("zsh")
+	if _zsh ~= "" then
+		_shell = _zsh
+	elseif vim.env.SHELL and vim.env.SHELL ~= "" and vim.fn.executable(vim.env.SHELL) == 1 then
+		_shell = vim.env.SHELL
+	end
 end
 if _shell and _shell ~= "" and vim.fn.executable(_shell) == 1 then
-  vim.opt.shell = _shell
+	vim.opt.shell = _shell
 end
 
 -- ── Provider settings (suppress health-check warnings) ────────────────────────
@@ -29,9 +29,9 @@ vim.g.loaded_ruby_provider = 0
 --   vim.g.python3_host_prog = "/path/to/venv/bin/python"
 local _py = vim.fn.exepath("python3")
 if _py ~= "" then
-  vim.g.python3_host_prog = _py
+	vim.g.python3_host_prog = _py
 end
-
+vim.opt.sessionoptions:remove({ "terminal" }) -- fix: terminal problems
 vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.tabstop = 4
@@ -57,7 +57,8 @@ vim.opt.inccommand = "split"
 vim.opt.winborder = "rounded"
 vim.opt.laststatus = 3
 vim.diagnostic.config({
-    severity_sort = true, update_in_insert = false,
-    virtual_text = { spacing = 2, source = "if_many" },
-    float = { border = "rounded", source = true },
+	severity_sort = true,
+	update_in_insert = false,
+	virtual_text = { spacing = 2, source = "if_many" },
+	float = { border = "rounded", source = true },
 })
