@@ -18,13 +18,21 @@ vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Window right" })
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 vim.keymap.set("x", "<leader>p", [["_dP]], { desc = "Paste without overwriting register" })
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]], { desc = "Search & replace word under cursor" })
+vim.keymap.set(
+	"n",
+	"<leader>s",
+	[[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]],
+	{ desc = "Search & replace word under cursor" }
+)
 
 vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle, { desc = "Undotree" })
-vim.keymap.set("n", "<leader>gs", vim.cmd.Git, { desc = "Git (fugitive)" })
 
 -- Existing shortcut now uses the shared, quoted runner.
-vim.keymap.set("n", "<leader>r", function() require("config.runner").run() end, { desc = "Run current file" })
-vim.keymap.set("n", "<leader>ct", function() require("config.theme").select() end, { desc = "Choose theme" })
+vim.keymap.set("n", "<leader>r", function()
+	require("config.runner").run()
+end, { desc = "Run current file" })
+vim.keymap.set("n", "<leader>ct", function()
+	require("config.theme").select()
+end, { desc = "Choose theme" })
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<cr>", { desc = "Clear search highlight" })
 vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], { desc = "Leave terminal mode" })
