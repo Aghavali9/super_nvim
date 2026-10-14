@@ -7,15 +7,14 @@ The configuration includes:
 - Alpha dashboard with the BAT-VIM ASCII header
 - Persistent theme selection
 - Telescope search and project navigation
-- Oil file management
-- Harpoon quick file marks
+- Oil file management and Flash motion jumps
 - Native Neovim LSP with Mason-managed servers
 - Blink completion with super-tab preset and LuaSnip snippets
 - Conform formatting and nvim-lint linting
 - nvim-dap debugging
 - neotest test running
-- ToggleTerm terminals and Lazygit integration
-- Persistent sessions
+- Snacks terminal toggles, task output, and Lazygit integration
+- Persistent sessions and manual project picker
 - Native Treesitter code folding
 - Native commenting (`gc`, `gcc`)
 - C, C++, Python, Java, Lua, Shell, Markdown, JSON, and YAML tooling
@@ -126,12 +125,15 @@ Major namespaces are:
 | Prefix | Purpose |
 | --- | --- |
 | `Space f` | Find and navigation |
-| `Space c` | Code formatting and appearance |
+| `Space c` | Code, LSP actions, and appearance |
 | `Space d` | Debugging |
-| `Space t` | Testing |
-| `Space T` | Terminals |
+| `Space t` | Testing and terminal toggles |
 | `Space S` | Sessions |
-| `Space x` | Diagnostics |
+| `Space x` | Diagnostics and Trouble views |
+| `Space g` | Git and Lazygit |
+| `Space o` | Overseer tasks |
+| `Space m` | Language-specific helper actions |
+| `Space l` | Low-level/assembly views |
 
 ## Comprehensive key guide
 
@@ -148,7 +150,7 @@ The tables below document the custom BAT-VIM mappings in this configuration. Sta
 | Normal | `Space s` | Start a whole-word search-and-replace for the word under the cursor |
 | Visual | `Space p` | Paste over the selection without replacing the unnamed register |
 | Normal | `Space u` | Toggle Undotree |
-| Normal | `Space g s` | Open Fugitive Git interface |
+| Normal | `Space g g` | Open Lazygit |
 | Normal | `Space r` | Save and run exactly the current source file |
 | Normal | `Space c t` | Choose and persist a theme |
 
@@ -216,16 +218,16 @@ Example:
 
 | Mode | Key | Action |
 | --- | --- | --- |
-| Normal | `Space e` | Open Oil in the current directory |
 | Normal | `-` | Open the parent directory in Oil |
+| Normal | `Space -` | Open Oil in a floating window |
 
 Oil treats directories as editable buffers. Standard Oil mappings are available inside the Oil window.
 
 Example workflow:
 
-1. Press `Space e`.
+1. Press `-`.
 2. Navigate to a file and press Enter to open it.
-3. Press `-` from a normal file buffer to jump to its parent directory.
+3. Press `Space -` when you want a floating explorer window.
 
 ### Telescope search
 
@@ -234,6 +236,7 @@ Example workflow:
 | Normal | `Space f f` | Find files |
 | Normal | `Space f g` | Live grep across project files |
 | Normal | `Space f b` | Search open buffers |
+| Normal | `Space f h` | Search help tags |
 | Normal, with LSP attached | `Space f d` | Search diagnostics with Telescope |
 | Normal | `Space f p` | Open the project picker |
 
@@ -249,23 +252,16 @@ Space f g
 
 Type part of a function name, error message, or string. Select a result and press Enter.
 
-### Harpoon quick navigation
+### Search, tasks, and utility mappings
 
 | Mode | Key | Action |
 | --- | --- | --- |
-| Normal | `Space a` | Add the current file to Harpoon |
-| Normal | `Ctrl-e` | Open the Harpoon quick menu |
-| Normal | `Space 1` | Jump to Harpoon file 1 |
-| Normal | `Space 2` | Jump to Harpoon file 2 |
-| Normal | `Space 3` | Jump to Harpoon file 3 |
-| Normal | `Space 4` | Jump to Harpoon file 4 |
-
-Example workflow:
-
-1. Open `src/main.c` and press `Space a`.
-2. Open `include/app.h` and press `Space a`.
-3. Use `Space 1` and `Space 2` to jump between them without opening a picker.
-4. Use `Ctrl-e` to inspect or reorder the Harpoon list.
+| Normal / Visual | `Space s r` | Open Grug-far search and replace |
+| Normal | `Space o r` | Open Overseer run-task picker |
+| Normal | `Space o t` | Toggle Overseer task list |
+| Normal | `Space o a` | Open action menu for the current Overseer task |
+| Normal | `Space b d` | Delete the current buffer without closing the split |
+| Normal | `Space u n` | Dismiss Snacks notifications |
 
 ### LSP navigation and code actions
 
@@ -288,10 +284,10 @@ Configured LSP servers:
 | Language | Server |
 | --- | --- |
 | C / C++ | `clangd` |
-| Python | `basedpyright` |
+| Python | `pyright` |
 | Lua | `lua_ls` |
 | Java | `jdtls` |
-| Shell | `bashls` |
+| Markdown | `marksman` |
 
 Example: rename a function
 
@@ -353,34 +349,30 @@ Included custom snippet triggers include examples such as:
 | --- | --- | --- |
 | Normal | `Space c f` | Format the current buffer |
 | Visual | `Space c f` | Format the current selection |
-| Normal | `Space c F` | Toggle format-on-save for the current Neovim session |
 
-Format-on-save uses an 800 ms timeout and falls back to LSP formatting when configured external formatters are unavailable.
+Format-on-save uses a 1000 ms timeout and falls back to LSP formatting when configured external formatters are unavailable.
 
 Configured formatters include:
 
 | File type | Formatter |
 | --- | --- |
 | Lua | `stylua` |
-| Python | `black` |
-| C / C++ / Java | `clang_format` |
-| Shell | `shfmt` |
-| Markdown / JSON / YAML | `prettier` |
+| Python | `isort`, `black` |
+| C / C++ | `clang_format` |
+| Markdown | `prettier` |
 
 The Mason package is named `clang-format`, while Conform refers to it internally as `clang_format`.
 
-Example: temporarily disable automatic formatting
-
-```text
-Space c F
-```
-
-Press the same binding again to turn format-on-save back on.
-
-For only one buffer, run:
+Example: temporarily disable automatic formatting for one buffer:
 
 ```vim
 :let b:disable_autoformat = v:true
+```
+
+To disable it globally for the current session:
+
+```vim
+:let g:disable_autoformat = v:true
 ```
 
 Useful formatting diagnostics:
@@ -436,7 +428,8 @@ These mappings come from nvim-surround rather than BAT-VIM-specific remaps.
 | --- | --- | --- |
 | Normal | `Space x x` | Toggle workspace diagnostics in Trouble |
 | Normal | `Space x X` | Toggle diagnostics for the current buffer only |
-| Normal | `Space x q` | Toggle the quickfix list in Trouble |
+| Normal | `Space c s` | Toggle document symbols in Trouble |
+| Normal | `Space c l` | Toggle LSP definitions/references in Trouble |
 | Normal, with LSP attached | `Space f d` | Open diagnostics in Telescope |
 
 Example debugging workflow for compile errors:
@@ -449,13 +442,11 @@ Example debugging workflow for compile errors:
 
 | Mode | Key | Action |
 | --- | --- | --- |
-| Normal / Insert / Terminal | `Ctrl-\` | Toggle the main terminal |
-| Normal | `Space T h` | Open a horizontal terminal |
-| Normal | `Space T v` | Open a vertical terminal |
-| Normal | `Space T f` | Open a floating terminal |
+| Normal / Terminal | `Ctrl-\` | Toggle the floating terminal |
+| Normal / Terminal | `Space t t` | Toggle a horizontal terminal split |
 | Terminal | `Esc Esc` | Leave Terminal mode and return to Normal mode |
 
-The default ToggleTerm direction is floating. BAT-VIM prefers `zsh` when it is installed, so embedded terminals and shell-based runner commands use zsh instead of silently falling back to bash. To force another shell, start BAT-VIM with `BATVIM_SHELL` set to an executable path, for example:
+Snacks terminal is used for terminal toggles. BAT-VIM prefers `zsh` when it is installed, so embedded terminals and shell-based runner commands use zsh instead of silently falling back to bash. To force another shell, start BAT-VIM with `BATVIM_SHELL` set to an executable path, for example:
 
 ```bash
 BATVIM_SHELL=/bin/fish NVIM_APPNAME=super_nvim nvim
@@ -721,11 +712,7 @@ Build and run it with:
 Space r
 ```
 
-When prompted for the CMake executable, enter the target name generated by the scaffold, for example:
-
-```text
-MyApp
-```
+`Space r` compiles and runs the currently open source file and does not prompt for a CMake target.
 
 ### Create a Python project
 
@@ -783,7 +770,7 @@ Open `Main.java` and press:
 Space r
 ```
 
-to run the Maven compile and exec workflow.
+to run that Java file with Java source-file mode.
 
 ## Markdown
 
@@ -857,10 +844,10 @@ BAT-VIM includes:
 Main custom binding:
 
 ```text
-Space g s
+Space g g
 ```
 
-This opens Fugitive's Git interface.
+This opens Lazygit inside BAT-VIM.
 
 You can also use normal Fugitive commands such as:
 
@@ -944,10 +931,10 @@ The configured LSP servers are:
 
 ```text
 clangd
-basedpyright
+pyright
 lua_ls
 jdtls
-bashls
+marksman
 ```
 
 Common formatter and linter packages can be installed through Mason, for example:
@@ -1166,10 +1153,9 @@ For a multi-file CMake build, open a terminal with `Ctrl-\` and run your normal 
 ### Git-oriented workflow
 
 ```text
-Space g s    open Fugitive
+Space g g    open Lazygit
 Space f g    search project text
-Space a      Harpoon important files
-Space 1      jump to first Harpoon file
+Space s r    search and replace
 Space S s    save session
 ```
 
