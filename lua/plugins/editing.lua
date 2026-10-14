@@ -1,6 +1,17 @@
 -- lua/plugins/editing.lua
 return {
 	{
+		"mbbill/undotree",
+		cmd = { "UndotreeToggle", "UndotreeShow", "UndotreeHide", "UndotreeFocus" },
+		keys = {
+			{ "<leader>u", "<cmd>UndotreeToggle<cr>", desc = "Toggle Undotree" },
+		},
+		init = function()
+			vim.g.undotree_SetFocusWhenToggle = 1
+			vim.g.undotree_WindowLayout = 2
+		end,
+	},
+	{
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
