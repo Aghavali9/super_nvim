@@ -1,83 +1,82 @@
-# BAT-VIM - Super Neovim Configuration
+# BAT-VIM — Super Neovim Config
 
-BAT-VIM is a modular Neovim configuration for Neovim 0.11.3 and newer. This edition keeps the newer safety and runtime improvements while restoring the original BAT-VIM dashboard identity.
+A modular, Lua-based Neovim setup with a BAT-VIM startup dashboard, native LSP support, completion, debugging, testing, project helpers, and a persistent theme selector.
 
-The configuration includes:
+**Neovim:** 0.11.3 or newer  
 
-- Alpha dashboard with the BAT-VIM ASCII header
-- Persistent theme selection
-- Telescope search and project navigation
-- Oil file management and Flash motion jumps
-- Native Neovim LSP with Mason-managed servers
-- Blink completion with super-tab preset and LuaSnip snippets
-- Conform formatting and nvim-lint linting
-- nvim-dap debugging
-- neotest test running
-- Snacks terminal toggles, task output, and Lazygit integration
-- Persistent sessions and manual project picker
-- Native Treesitter code folding
-- Native commenting (`gc`, `gcc`)
-- C, C++, Python, Java, Lua, Shell, Markdown, JSON, and YAML tooling
-- Current-file run commands for C, C++, Python, Java, shell scripts, and Lua
-- Safe project scaffolding commands for C, Python, and Java
+## Features
 
-The default installer uses `NVIM_APPNAME=super_nvim`, which allows BAT-VIM to live beside an existing Neovim configuration instead of replacing it.
+- **Startup and appearance:** BAT-VIM Alpha dashboard, lualine, which-key, file icons, persistent Rose Pine / Catppuccin / Tokyo Night / Kanagawa and built-in colorscheme selection.
+- **Navigation:** Telescope searching, Oil file explorer, quick file navigation and project-related pickers.
+- **Coding:** Neovim's built-in LSP interface with Mason-managed language servers, Blink completion, LuaSnip, Tree-sitter, formatting, linting and diagnostics.
+- **Development:** A current-file runner for Python, C, C++, Java, shell, and Lua; C, Python, and Java project scaffolding; nvim-dap and Python-focused neotest integration.
+- **Workflow:** Git integration, terminal windows, persistent sessions, search-and-replace, Markdown tooling, and optional Obsidian vault integration.
+- **Safety:** A local-copy installer with a dry-run mode, checks, and backups when replacing an existing configuration.
 
 ## Requirements
 
-The minimum requirements are:
+### Required
 
-- Neovim 0.11.3 or newer
+- Neovim **0.11.3+** (`nvim --version`)
 - Git
-- Bash and GNU coreutils for the included installer
-- Internet access during the first plugin installation
+- Internet access for the initial lazy.nvim/plugin installation
+- For `installer.sh`: Bash and GNU-style tools including `realpath`, `mktemp`, `cp`, `mv`, and `mkdir`
 
-Recommended external tools depend on the features you use:
+### Recommended / feature-specific
 
-| Tool | Used for |
+| Tool | Purpose |
 | --- | --- |
-| `rg` / ripgrep | Telescope live grep |
-| `fd` or `fdfind` | Faster file discovery when available |
-| `make` | Native plugin builds, including Telescope FZF when available |
-| `gcc` / `g++` | C and C++ single-file running |
-| `cmake` | Manual CMake project builds and C project scaffolding |
-| Python 3 | Python development and tooling |
-| Python venv support | Project-local Python environments |
-| Node.js / npm | Some language tools and Markdown preview |
-| JDK 11+ | Java LSP and Java source-file running |
-| Maven | Maven Java projects |
-| Gradle | Gradle Java projects when a wrapper is not present |
-| `pytest` | Python testing |
-| `wl-clipboard` or `xclip` | System clipboard integration on Linux |
-| Nerd Font | Best appearance for plugins that use icons |
-| `tree-sitter` CLI 0.26.1+ | Installing/updating non-bundled Tree-sitter parsers on Neovim 0.12+ |
+| `rg` (ripgrep) | Telescope live text search |
+| `fd` or `fdfind` | Fast file discovery |
+| `make`, C compiler | Compiled plugin components and C development |
+| `gcc` / `g++` | Running single C / C++ files |
+| `cmake` | Building CMake projects produced by scaffolding |
+| Python 3, `venv`, `pytest` | Python development and tests |
+| Node.js / npm | Certain language servers, tools, and Markdown preview |
+| Java 11+, Maven | Java source-file running and Maven projects |
+| `lua` or `luajit` | Running standalone Lua files |
+| `lazygit` | Snacks Lazygit interface (`<leader>gg`) |
+| `zsh` | Preferred embedded shell when installed; otherwise a valid `$SHELL` |
+| `wl-clipboard` / `xclip` | Clipboard integration on Linux |
+| Nerd Font | Correct icon rendering |
+| `tree-sitter` CLI | Parser installation/updating with the Neovim 0.12+ Tree-sitter branch |
+
+Not all tools are required for every user or language. The installer **does not install OS packages**.
 
 ## Installation
 
-### Recommended: install beside your current Neovim configuration
+### 1. Clone the repository
 
-Extract the archive, enter the `super_nvim-main` directory, and run:
+```bash
+git clone https://github.com/Aghavali9/super_nvim.git
+cd super_nvim
+```
+
+### 2. Check the installation
 
 ```bash
 bash installer.sh --check-deps
 bash installer.sh --dry-run
+```
+
+`--check-deps` reports required and some optional programs. `--dry-run` prints the proposed destination without replacing files.
+
+### 3. Install in its own Neovim profile (recommended)
+
+```bash
 bash installer.sh
 NVIM_APPNAME=super_nvim nvim
 ```
 
-The installer verifies dependencies with `--check-deps` (reporting package hints for Fedora, Ubuntu/Debian, and Arch) and copies this local package. It does not clone a different remote version, install operating-system packages, use `sudo`, or add PPAs.
-
-On first launch, Lazy will install the configured plugins. Allow installation to finish, then restart BAT-VIM with:
+The installer copies the **local repository files** to `${XDG_CONFIG_HOME:-$HOME/.config}/super_nvim`. On first launch, lazy.nvim installs plugins. After the installation has settled, quit and launch again:
 
 ```bash
 NVIM_APPNAME=super_nvim nvim
 ```
 
-If a previous `super_nvim` configuration exists, the installer creates a uniquely named backup before replacing it.
+The separate app name also gives this profile its own Neovim data, state, and cache directories.
 
-### Install as your normal Neovim configuration
-
-If you want BAT-VIM to become your normal `nvim` configuration:
+### Alternative: make it your default Neovim configuration
 
 ```bash
 bash installer.sh --app nvim --dry-run
@@ -85,1199 +84,226 @@ bash installer.sh --app nvim
 nvim
 ```
 
-Close other Neovim instances before replacing an active configuration. The installer prints the backup and rollback locations.
+**Important:** close running Neovim instances before replacing an active configuration. If the destination exists, the installer moves it to a uniquely named backup directory and prints its location and rollback commands. It does not run `sudo`, install system packages, or automatically clone an updated remote checkout.
 
-## Dashboard
+### Keeping the configuration up to date
 
-The startup dashboard restores the original BAT-VIM ASCII header while retaining the newer Theme and Health actions.
+From your source clone:
 
-Dashboard keys:
-
-| Key | Action |
-| --- | --- |
-| `e` | Create a new buffer and enter Insert mode |
-| `f` | Find a file with Telescope |
-| `r` | Open recent files with Telescope |
-| `t` | Search text with Telescope live grep |
-| `c` | Open the active Neovim configuration file |
-| `s` | Open the persistent theme selector |
-| `h` | Open the BAT-VIM dependency health window |
-| `q` | Quit Neovim |
-
-The footer reports how many plugins loaded and the measured Lazy startup time.
-
-## Leader key
-
-The leader key is `Space`.
-
-Whenever this README shows a binding such as:
-
-```text
-Space f f
+```bash
+git pull --ff-only
+bash installer.sh --dry-run
+bash installer.sh
+NVIM_APPNAME=super_nvim nvim
 ```
 
-press `Space`, then `f`, then `f`.
+Inside Neovim, use `:Lazy sync` if plugin changes require synchronization, then restart. Back up any modifications made directly under `~/.config/super_nvim` before reinstalling: the installer replaces that destination with your local source copy.
 
-Which-key is enabled. If you pause after a leader prefix, BAT-VIM shows available mappings for that prefix.
+## First steps
 
-Major namespaces are:
+1. Open `NVIM_APPNAME=super_nvim nvim`.
+2. Let lazy.nvim install plugins and restart Neovim.
+3. Run `:SuperHealth` and `:checkhealth` to inspect dependencies and providers.
+4. Run `:Mason` to inspect managed language tools.
+5. Press **Space** to see available leader groups via which-key.
+6. Choose an appearance with `:Theme` or `Space c t`.
 
-| Prefix | Purpose |
-| --- | --- |
-| `Space f` | Find and navigation |
-| `Space c` | Code, LSP actions, and appearance |
-| `Space d` | Debugging |
-| `Space t` | Testing and terminal toggles |
-| `Space S` | Sessions |
-| `Space x` | Diagnostics and Trouble views |
-| `Space g` | Git and Lazygit |
-| `Space o` | Overseer tasks |
-| `Space m` | Language-specific helper actions |
-| `Space l` | Low-level/assembly views |
+## Keybindings
 
-## Comprehensive key guide
+`<leader>` means **Space**. For example, `<leader>ff` means Space, then `f`, then `f`. These are custom shortcuts and selected relevant Neovim defaults; plugins can provide additional local mappings. Use `:map`, `:nmap`, and which-key to inspect the mappings actually loaded by your installed revision.
 
-The tables below document the custom BAT-VIM mappings in this configuration. Standard Neovim motions and plugin-local defaults continue to work unless explicitly replaced.
+### Editing and navigation
 
-### Basic editing and control
-
-| Mode | Key | Action |
+| Mode | Keys | Action |
 | --- | --- | --- |
-| Insert | `j k` | Leave Insert mode |
-| Normal | `Space w` | Save the current buffer |
-| Normal | `Space q` | Quit all Neovim windows |
+| Insert | `jk` | Return to Normal mode |
+| Normal | `Space w` | Save current buffer |
+| Normal | `Space q` | Quit all windows (`:qa`) |
 | Normal | `Esc` | Clear search highlighting |
-| Normal | `Space s` | Start a whole-word search-and-replace for the word under the cursor |
-| Visual | `Space p` | Paste over the selection without replacing the unnamed register |
+| Normal | `Space s` | Begin whole-word substitute on word under cursor |
+| Visual | `Space p` | Paste without overwriting the unnamed register |
 | Normal | `Space u` | Toggle Undotree |
-| Normal | `Space g g` | Open Lazygit |
-| Normal | `Space r` | Save and run exactly the current source file |
-| Normal | `Space c t` | Choose and persist a theme |
+| Normal | `Space r` | Save and run current file |
+| Normal | `Ctrl-h/j/k/l` | Move between splits |
+| Normal | `Ctrl-d` / `Ctrl-u` | Scroll half a screen and recenter |
+| Normal | `n` / `N` | Next / previous search result, recentered |
+| Visual | `J` / `K` | Move highlighted lines down / up |
+| Terminal | `Esc Esc` | Leave terminal-input mode |
 
-#### Example: save and run
+### Search, files, and Git
 
-While editing `main.py`:
+| Keys | Action |
+| --- | --- |
+| `Space f f` | Find files in Telescope |
+| `Space f g` | Live grep with Telescope (requires `rg`) |
+| `Space f b` | Open-buffer picker |
+| `Space f d` | Diagnostics picker (when LSP is attached) |
+| `Space f p` | Project picker |
+| `-` | Open parent directory with Oil |
+| `Space g s` | Open vim-fugitive Git interface |
+| `Space g g` | Open Lazygit via Snacks (requires `lazygit`) |
+| `Space b d` | Delete buffer while preserving the split |
+| `Space u n` | Dismiss Snacks notifications |
 
-```text
-Space w
-Space r
-```
+### Language-server actions
 
-`Space r` saves a modified source file automatically, then runs that exact buffer. It never asks for a CMake target or executable name.
+| Keys | Action |
+| --- | --- |
+| `gd` | Go to definition |
+| `grr` | Find references (native Neovim 0.11+ mapping) |
+| `K` | Hover documentation, with an attached language server |
+| `Space c r` | Rename symbol |
+| `Space c a` | Code actions |
+| `Space c f` | Format the current buffer / selection |
+| `Space x x` | Workspace diagnostics (Trouble) |
+| `Space x X` | Current-buffer diagnostics (Trouble) |
+| `Space x q` | Quickfix list (Trouble) |
 
-#### Example: replace the current word
+LSP availability is filetype- and server-dependent. Neovim 0.11+ also provides built-in mappings such as `grn` (rename), `gra` (code actions), and `gri` (implementation).
 
-Place the cursor on `old_name` and press:
+### Terminal, debugging, testing and sessions
 
-```text
-Space s
-```
+| Keys | Action |
+| --- | --- |
+| `Ctrl-\` | Toggle floating terminal (Snacks) |
+| `Space t t` | Toggle horizontal terminal (Snacks) |
+| `Space d b` | Toggle debugger breakpoint |
+| `Space d c` | Start / continue debugging |
+| `Space d n` / `Space d i` / `Space d o` | Step over / in / out |
+| `Space d u` | Toggle debugger UI |
+| `Space d t` | Terminate debug session |
+| `Space t n` | Run nearest test |
+| `Space t f` | Run tests in current file |
+| `Space t s` | Run test suite |
+| `Space t o` | Toggle test output |
+| `Space S s` | Save session |
+| `Space S r` | Restore current-directory session |
+| `Space S L` | Restore latest session |
+| `Space S d` | Stop persisting current session |
 
-BAT-VIM opens a command similar to:
+Debug adapters and test runners must be available for the relevant language. The included neotest configuration is oriented toward Python/pytest.
 
-```vim
-:%s/\<old_name\>/old_name/gI
-```
+## LSP, completion, formatting and syntax
 
-Edit the replacement portion and press Enter.
+### Language servers
 
-### Scrolling and search result movement
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Ctrl-d` | Scroll half a page down and recenter the cursor |
-| Normal | `Ctrl-u` | Scroll half a page up and recenter the cursor |
-| Normal | `n` | Jump to the next search result and recenter it |
-| Normal | `N` | Jump to the previous search result and recenter it |
-
-### Window navigation
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Ctrl-h` | Move to the window on the left |
-| Normal | `Ctrl-j` | Move to the window below |
-| Normal | `Ctrl-k` | Move to the window above |
-| Normal | `Ctrl-l` | Move to the window on the right |
-
-These are particularly useful after opening terminal splits, Trouble, Undotree, or other side windows.
-
-### Visual selection movement
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Visual | `J` | Move the selected lines down one line and reindent |
-| Visual | `K` | Move the selected lines up one line and reindent |
-
-Example:
-
-1. Select several lines with Visual Line mode using `V`.
-2. Press `J` repeatedly to move the block downward.
-3. Press `K` to move it upward.
-
-### File explorer: Oil
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `-` | Open the parent directory in Oil |
-| Normal | `Space -` | Open Oil in a floating window |
-
-Oil treats directories as editable buffers. Standard Oil mappings are available inside the Oil window.
-
-Example workflow:
-
-1. Press `-`.
-2. Navigate to a file and press Enter to open it.
-3. Press `Space -` when you want a floating explorer window.
-
-### Telescope search
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space f f` | Find files |
-| Normal | `Space f g` | Live grep across project files |
-| Normal | `Space f b` | Search open buffers |
-| Normal | `Space f h` | Search help tags |
-| Normal, with LSP attached | `Space f d` | Search diagnostics with Telescope |
-| Normal | `Space f p` | Open the project picker |
-
-Telescope ignores common heavy directories such as `.git`, `node_modules`, `.venv`, and `build`.
-
-Hidden files are included in `find_files`.
-
-Example: find a symbol by text
-
-```text
-Space f g
-```
-
-Type part of a function name, error message, or string. Select a result and press Enter.
-
-### Search, tasks, and utility mappings
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal / Visual | `Space s r` | Open Grug-far search and replace |
-| Normal | `Space o r` | Open Overseer run-task picker |
-| Normal | `Space o t` | Toggle Overseer task list |
-| Normal | `Space o a` | Open action menu for the current Overseer task |
-| Normal | `Space b d` | Delete the current buffer without closing the split |
-| Normal | `Space u n` | Dismiss Snacks notifications |
-
-### LSP navigation and code actions
-
-These mappings become buffer-local when an LSP server attaches.
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `g d` | Go to definition (`vim.lsp.buf.definition`) |
-| Normal | `g D` | Go to declaration (`vim.lsp.buf.declaration`) |
-| Normal | `g r r` | List references (native Neovim 0.11+) |
-| Normal | `K` | Show LSP hover documentation with rounded borders (`vim.lsp.buf.hover`) |
-| Normal | `Space c r` | Rename symbol, when supported by the server |
-| Normal | `Space c a` | Show available code actions, when supported |
-| Normal | `Space f d` | Telescope diagnostics picker |
-
-`grr` (references), `gra` (code actions), `gri` (implementations), `grn` (rename), and `gO` (document symbols) are native Neovim 0.11+ defaults. Buffer-local `gd`, `gD`, and `K` are explicitly bound on `LspAttach` to ensure reliable LSP navigation and hover documentation with rounded borders.
-
-Configured LSP servers:
+Mason-managed server configuration includes:
 
 | Language | Server |
 | --- | --- |
 | C / C++ | `clangd` |
-| Python | `pyright` |
+| Python | `basedpyright` |
 | Lua | `lua_ls` |
 | Java | `jdtls` |
-| Markdown | `marksman` |
+| Shell | `bashls` |
 
-Example: rename a function
-
-1. Put the cursor on the function name.
-2. Press `Space c r`.
-3. Type the new name.
-4. Press Enter.
-
-Example: inspect a diagnostic
-
-1. Move to a line with a warning or error.
-2. Use `K` for symbol documentation if relevant.
-3. Use `Space c a` for quick fixes.
-4. Use `Space f d` to inspect all diagnostics in Telescope.
+Run `:LspInfo` or `:checkhealth vim.lsp` when a server fails to attach. Language servers are not the same as compilers or runtimes: for example, `clangd` does not replace `gcc`/`g++` for `<leader>r`.
 
 ### Completion and snippets
 
-Blink completion does not preselect an item. This prevents Enter from accepting a completion that you did not explicitly choose.
+Completion uses **blink.cmp** with LSP, path, snippets, and buffer sources; snippets use **LuaSnip** and friendly-snippets. Use `Tab` and `Shift-Tab` to navigate completion/snippet choices, and consult the live completion menu for Enter/selection behavior. The config also loads custom snippet definitions when available.
 
-| Mode | Key | Action |
-| --- | --- | --- |
-| Insert / completion menu | `Tab` | Select the next completion item or jump forward in a snippet |
-| Insert / completion menu | `Shift-Tab` | Select the previous item or jump backward in a snippet |
-| Insert / completion menu | `Up` | Select previous completion item |
-| Insert / completion menu | `Down` | Select next completion item |
-| Insert / completion menu | `Enter` | Accept the selected completion; otherwise fall back to normal Enter behavior |
-| Insert | `Ctrl-Space` | Open completion / documentation |
-| Insert | `Ctrl-e` | Hide completion menu |
-| Insert | `Ctrl-b` | Scroll completion documentation upward |
-| Insert | `Ctrl-f` | Scroll completion documentation downward |
-| Insert / Select | `Ctrl-k` | Jump forward through LuaSnip fields |
-| Insert / Select | `Ctrl-j` | Jump backward through LuaSnip fields |
+### Formatting and diagnostics
 
-Example completion flow:
+Conform provides formatting; configured external tools must be installed to run. Open `:ConformInfo` to see the formatter selected for the current buffer. Formatting mappings and format-on-save are subject to buffer-specific and global settings. Trouble offers diagnostic and quickfix views.
 
-1. Begin typing a symbol.
-2. Press `Tab` until the desired candidate is highlighted.
-3. Press Enter to accept it.
+### Tree-sitter and folding
 
-Example snippet flow:
+The configuration selects a compatible **nvim-treesitter** branch for your Neovim version: the legacy `master` interface on 0.11, and the new `main` interface on 0.12+. Neovim's **native Tree-sitter fold expression** is configured, rather than nvim-ufo. Standard fold commands include `za` (toggle), `zo` (open), `zc` (close), `zR` (open all) and `zM` (close all).
 
-1. In a Python file type `def` and expand the snippet through completion.
-2. Fill the function name.
-3. Use `Ctrl-k` or `Tab` to move through snippet fields.
-4. Use `Ctrl-j` to move backward when needed.
+## Running the current file (`Space r`)
 
-Included custom snippet triggers include examples such as:
+The runner saves the active source buffer if modified, then opens a bottom terminal split for output and interactive input. It operates on the **current file**, not the entire project.
 
-- Markdown: `tbl`, `tbl2x2`, `tbl3x2`, `tbl3x3`
-- Python: `def`, `class`, `main`, `test`, `prop`, `try`
-- Lua: `fn`, `mod`, `req`, `kmap`
-- C: `main`, `for`, `struct`, `pr`
-- C++: `main`, `class`, `forr`, `co`, `ns`
-- Java: `main`, `fore`, `sout`, `gs`, `test`
-
-### Formatting
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space c f` | Format the current buffer |
-| Visual | `Space c f` | Format the current selection |
-
-Format-on-save uses a 1000 ms timeout and falls back to LSP formatting when configured external formatters are unavailable.
-
-Configured formatters include:
-
-| File type | Formatter |
+| Filetype | Behavior |
 | --- | --- |
-| Lua | `stylua` |
-| Python | `isort`, `black` |
-| C / C++ | `clang_format` |
-| Markdown | `prettier` |
+| Python | Run the current file with project `.venv` Python, active virtualenv, `python3`, or `python` in that order |
+| C | Compile the current `.c` with `gcc -Wall -Wextra -g`, then run |
+| C++ | Compile the current `.cpp` with `g++ -Wall -Wextra -g`, then run |
+| Java | Run current source file via Java 11+ `java File.java` mode |
+| Shell | Execute the current script using the configured shell |
+| Lua | Run using `lua`, or `luajit` if Lua is unavailable |
 
-The Mason package is named `clang-format`, while Conform refers to it internally as `clang_format`.
+C/C++ runner executables are placed in Neovim's cache directory, not next to the source. Single-file compilation will not link the rest of a multi-file C/C++ project; build those projects separately with your normal build system.
 
-Example: temporarily disable automatic formatting for one buffer:
+For Python projects with a `src/` directory, the runner prepends that directory to `PYTHONPATH`. The working directory for a run is the current file's directory.
 
-```vim
-:let b:disable_autoformat = v:true
+To select a shell explicitly:
+
+```bash
+BATVIM_SHELL=/bin/bash NVIM_APPNAME=super_nvim nvim
 ```
 
-To disable it globally for the current session:
+If not overridden, the configuration prefers `zsh` when found, otherwise an executable `$SHELL`. The embedded terminal and the external terminal emulator are different things.
 
-```vim
-:let g:disable_autoformat = v:true
-```
+## Project scaffolding
 
-Useful formatting diagnostics:
+The configuration defines the following Ex commands, which generate starter files and refuse to overwrite existing generated targets:
 
-```vim
-:ConformInfo
-```
-
-### Comments
-
-Neovim's built-in commenting provides native comment toggling without external plugin overhead:
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `g c c` | Toggle comment on the current line |
-| Normal / Visual | `g c` | Toggle linewise comment using an operator or visual selection |
-| Normal / Visual | `g b` | Toggle block comment (with motion/selection) |
-
-Examples:
-
-```text
-gcc
-```
-
-comments or uncomments the current line.
-
-Select several lines visually and press:
-
-```text
-gc
-```
-
-to toggle comments across the selection.
-
-### Surround editing
-
-nvim-surround is enabled with its standard mappings.
-
-Common examples:
-
-| Command | Result |
+| Command | Generates |
 | --- | --- |
-| `ysiw"` | Surround the current word with double quotes |
-| `ysiw)` | Surround the current word with parentheses |
-| `ds"` | Delete surrounding double quotes |
-| `cs"'` | Change surrounding double quotes to single quotes |
+| `:CProject MyApp` | C starter with `CMakeLists.txt`, `src/main.c`, includes and gitignore |
+| `:PyProject myapp` | Python `src`-layout starter with package metadata and tests |
+| `:JavaProject MyApp` | Maven-based Java starter with source/test tree |
 
-These mappings come from nvim-surround rather than BAT-VIM-specific remaps.
+Names should start with a letter and contain letters, digits, underscores or hyphens. These commands **create starter structures**; they do not install compilers, create every virtual environment, or fetch every Java/Python dependency.
 
-### Diagnostics and Trouble
+## Themes
 
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space x x` | Toggle workspace diagnostics in Trouble |
-| Normal | `Space x X` | Toggle diagnostics for the current buffer only |
-| Normal | `Space c s` | Toggle document symbols in Trouble |
-| Normal | `Space c l` | Toggle LSP definitions/references in Trouble |
-| Normal, with LSP attached | `Space f d` | Open diagnostics in Telescope |
+Open `:Theme` or press `Space c t` to choose and persist a theme. Direct commands such as `:Theme rose-pine` set and save the choice. Available collections include Rose Pine, Catppuccin, Tokyo Night, Kanagawa and selected built-in Neovim schemes. The theme preference is saved under Neovim's state directory; a normal `:colorscheme` change is session-only.
 
-Example debugging workflow for compile errors:
+## Markdown and notes
 
-1. Run or build with `Space r`.
-2. Open workspace diagnostics with `Space x x`.
-3. Select an item and press Enter to jump to it.
+Markdown functionality includes Tree-sitter syntax support, formatting via available tools, snippets, preview/rendering support, and optional Obsidian integration. Use `:MarkdownPreview` and `:MarkdownPreviewStop` when the preview plugin and its prerequisites are installed.
 
-### Terminals
+Obsidian integration is conditional on a vault directory. Set `OBSIDIAN_VAULT` to a directory, or use the configured default `~/obsidian` where applicable. If the directory is absent, optional vault integration is not activated.
 
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal / Terminal | `Ctrl-\` | Toggle the floating terminal |
-| Normal / Terminal | `Space t t` | Toggle a horizontal terminal split |
-| Terminal | `Esc Esc` | Leave Terminal mode and return to Normal mode |
-
-Snacks terminal is used for terminal toggles. BAT-VIM prefers `zsh` when it is installed, so embedded terminals and shell-based runner commands use zsh instead of silently falling back to bash. To force another shell, start BAT-VIM with `BATVIM_SHELL` set to an executable path, for example:
-
-```bash
-BATVIM_SHELL=/bin/fish NVIM_APPNAME=super_nvim nvim
-```
-
-Kitty is the outer terminal emulator; a Neovim terminal buffer is not a second Kitty window. It can, however, run the same zsh shell and zsh configuration inside Kitty.
-
-Example:
-
-1. Press `Ctrl-\` to open a terminal.
-2. Run shell commands normally.
-3. Press `Esc Esc` to enter Normal mode in the terminal buffer.
-4. Use `Ctrl-h`, `Ctrl-j`, `Ctrl-k`, or `Ctrl-l` to move to another Neovim window.
-
-### Debugging with nvim-dap
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space d b` | Toggle breakpoint |
-| Normal | `Space d B` | Set a conditional breakpoint |
-| Normal | `Space d c` | Start or continue debugging |
-| Normal | `Space d n` | Step over |
-| Normal | `Space d i` | Step into |
-| Normal | `Space d o` | Step out |
-| Normal | `Space d t` | Terminate debug session |
-| Normal | `Space d r` | Open DAP REPL |
-| Normal | `Space d u` | Toggle DAP UI |
-
-Mason-nvim-dap is configured to install:
-
-- `codelldb` for C and C++
-- Python's debug adapter
-
-Example debug sequence:
-
-1. Put the cursor on an executable line.
-2. Press `Space d b`.
-3. Press `Space d c` to start debugging.
-4. Use `Space d n`, `Space d i`, and `Space d o` to step.
-5. Press `Space d u` if you want to show or hide the debug UI manually.
-6. Press `Space d t` to terminate.
-
-The DAP UI opens automatically when a debug session initializes and closes when the session ends.
-
-### Tests with neotest
-
-The included neotest adapter is configured for Python using pytest.
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space t n` | Run the nearest test |
-| Normal | `Space t f` | Run tests in the current file |
-| Normal | `Space t s` | Run the test suite from the current working directory |
-| Normal | `Space t o` | Toggle the test output panel |
-| Normal | `Space t S` | Toggle the neotest summary |
-| Normal | `Space t x` | Stop the current test run |
-
-Example:
-
-1. Put the cursor inside a Python test function.
-2. Press `Space t n`.
-3. Press `Space t o` to inspect the output.
-
-### Sessions
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `Space S r` | Restore the session for the current working directory |
-| Normal | `Space S L` | Restore the most recently saved session |
-| Normal | `Space S s` | Save the current session |
-| Normal | `Space S d` | Stop persistence for the current session so it is not saved on exit |
-
-Example:
-
-```text
-Space S s
-```
-
-Save your session before leaving. Later, start Neovim in the same project and use:
-
-```text
-Space S r
-```
-
-to restore it.
-
-### Code folding
-
-BAT-VIM uses Neovim's native Treesitter folding (`foldmethod = "expr"`, `foldexpr = "v:lua.vim.treesitter.foldexpr()"`, `foldtext = ""`) with standard Vim fold controls:
-
-| Mode | Key | Action |
-| --- | --- | --- |
-| Normal | `zR` | Open all folds |
-| Normal | `zM` | Close all folds |
-| Normal | `za` | Standard Vim: toggle fold |
-| Normal | `zo` | Standard Vim: open fold |
-| Normal | `zc` | Standard Vim: close fold |
-
-## Theme system
-
-BAT-VIM keeps the original Rose Pine look and the useful built-in dark themes from the earlier refined version, while also providing the newer Catppuccin, Tokyo Night, and Kanagawa collections. The selection is persistent.
-
-Open the selector with:
-
-```text
-Space c t
-```
-
-or:
-
-```vim
-:Theme
-```
-
-Apply a theme directly with, for example:
-
-```vim
-:Theme rose-pine
-:Theme habamax
-:Theme quiet
-:Theme catppuccin-mocha
-```
-
-Available choices:
-
-| Theme | General appearance |
-| --- | --- |
-| `rose-pine` | Original BAT-VIM Rose Pine dark theme; default for new state |
-| `rose-pine-moon` | Softer Rose Pine dark variant |
-| `rose-pine-dawn` | Warm Rose Pine light variant |
-| `habamax` | Charcoal built-in theme |
-| `slate` | Muted built-in dark theme |
-| `quiet` | Very minimal, silent-looking built-in dark theme |
-| `desert` | Warm built-in dark theme |
-| `morning` | Built-in light theme |
-| `catppuccin-mocha` | Balanced, polished dark theme |
-| `catppuccin-macchiato` | Softer Catppuccin dark variant |
-| `catppuccin-latte` | Clean light Catppuccin variant |
-| `tokyonight-moon` | Deep blue modern dark theme |
-| `tokyonight-night` | Crisp, darker Tokyo Night variant |
-| `tokyonight-storm` | Muted blue-gray Tokyo Night variant |
-| `tokyonight-day` | Light Tokyo Night variant |
-| `kanagawa-wave` | Warm, cinematic dark theme |
-| `kanagawa-dragon` | Low-contrast Kanagawa dark theme |
-| `kanagawa-lotus` | Warm light Kanagawa variant |
-
-The selection is saved under Neovim's state directory in `super-theme.json`. If there is no saved theme, BAT-VIM starts with the original `rose-pine`. If a selected theme cannot be loaded, BAT-VIM falls back to `habamax`.
-
-Running a normal Neovim command such as `:colorscheme habamax` changes the theme only for the current session; use `:Theme NAME` when you want BAT-VIM to remember the selection.
-
-
-## Running the current file
-
-`Space r` is deliberately simple: it saves and runs exactly the file in the current buffer. It does not search for a CMake executable, does not ask for a target name, and does not switch to a different source file.
-
-The runner opens a bottom terminal split for compiler output, program output, and interactive stdin. On Unix-like systems BAT-VIM prefers zsh when it is installed.
-
-### Python
-
-For Python, BAT-VIM chooses an interpreter in this order:
-
-1. `<project>/.venv/bin/python`
-2. `<project>/.venv/Scripts/python.exe` on Windows
-3. the active `$VIRTUAL_ENV` interpreter
-4. `python3`
-5. `python`
-
-The current `.py` file is run directly. If the detected project contains a `src/` directory, BAT-VIM prepends that directory to `PYTHONPATH` while preserving your existing value. The process working directory is the directory containing the current file, which makes relative file access behave naturally.
-
-Example:
-
-```text
-Open src/myapp/main.py
-Space r
-```
-
-There is no additional prompt.
-
-### C and C++
-
-BAT-VIM always compiles only the current source buffer, even if the file lives inside a CMake project. This is intentional: `Space r` means "run this file", not "run the project".
-
-C uses:
-
-```text
-gcc -Wall -Wextra -g CURRENT_FILE -o CACHE_BINARY
-```
-
-C++ uses:
-
-```text
-g++ -Wall -Wextra -g CURRENT_FILE -o CACHE_BINARY
-```
-
-The binary is written under Neovim's cache directory rather than beside your source file, then executed immediately.
-
-Example:
-
-```text
-Open hello.cpp
-Space r
-```
-
-If `hello.cpp` has its own `main()`, it compiles and runs. If the file depends on other translation units from a larger project, a single-file compile can fail with missing-symbol errors; in that case use the project's normal build command from `Ctrl-\` or another terminal.
-
-### Java
-
-For a `.java` buffer, BAT-VIM uses Java 11+ source-file mode:
-
-```bash
-java CurrentFile.java
-```
-
-This deliberately ignores Maven and Gradle project launch targets because `Space r` is reserved for the current file. Use a terminal for full Maven or Gradle project commands.
-
-### Shell scripts
-
-For `sh`, `bash`, and `zsh` buffers, BAT-VIM runs the current script with the configured BAT-VIM shell. By default it prefers zsh when zsh is available.
-
-### Lua
-
-Standalone Lua files are run with `lua`, falling back to `luajit` when available.
-
-### Program input
-
-If the program reads from stdin, type directly into the bottom runner terminal after `Space r`. For example, a C++ program using `std::cin` will accept keyboard input in that terminal. Press `Esc Esc` when you want to leave terminal-input mode and navigate Neovim again.
-
-
-## Project scaffolding commands
-
-BAT-VIM provides commands rather than undocumented `Space m ...` shortcuts for project creation.
-
-Project names must:
-
-- start with a letter
-- contain only letters, digits, `_`, or `-`
-
-Scaffolding refuses to overwrite generated targets that already exist.
-
-### Create a C project
-
-Run in an empty project directory:
-
-```vim
-:CProject MyApp
-```
-
-This creates a structure similar to:
-
-```text
-CMakeLists.txt
-.gitignore
-include/
-src/
-  main.c
-```
-
-It then opens `src/main.c`.
-
-Build and run it with:
-
-```text
-Space r
-```
-
-`Space r` compiles and runs the currently open source file and does not prompt for a CMake target.
-
-### Create a Python project
-
-Run:
-
-```vim
-:PyProject myapp
-```
-
-This creates a `src`-layout project similar to:
-
-```text
-pyproject.toml
-.gitignore
-src/
-  myapp/
-    __init__.py
-    __main__.py
-tests/
-  test_basic.py
-```
-
-A hyphen in the project name is normalized to an underscore for the Python package name.
-
-After creating a virtual environment and installing the project/test requirements, use:
-
-```text
-Space r
-```
-
-to run the current Python source file, or use the neotest bindings for tests.
-
-### Create a Java project
-
-Run:
-
-```vim
-:JavaProject MyApp
-```
-
-The scaffold creates a Maven project using `com.example.Main`, JUnit 5, Maven Surefire, and the exec Maven plugin.
-
-Important generated paths include:
-
-```text
-pom.xml
-src/main/java/com/example/Main.java
-src/test/java/com/example/
-.gitignore
-```
-
-Open `Main.java` and press:
-
-```text
-Space r
-```
-
-to run that Java file with Java source-file mode.
-
-## Markdown
-
-Markdown support includes:
-
-- Tree-sitter parsing
-- Render Markdown inline rendering
-- Markdown Preview commands
-- Prettier formatting through Conform
-- Markdown LuaSnip table snippets
-- Optional Obsidian integration
-
-Useful commands:
-
-```vim
-:MarkdownPreview
-:MarkdownPreviewStop
-```
-
-To format the current Markdown document:
-
-```text
-Space c f
-```
-
-The older handwritten table-only alignment routine is no longer used. Formatting is delegated to Prettier or an available LSP formatter because the custom parser could mishandle escaped pipes, alignment markers, and Unicode content.
-
-Example table snippet:
-
-Type:
-
-```text
-tbl
-```
-
-and select the LuaSnip completion to create a simple two-column Markdown table.
-
-## Obsidian integration
-
-Obsidian support loads only when a vault exists.
-
-BAT-VIM checks:
-
-```text
-$OBSIDIAN_VAULT
-```
-
-when set, otherwise:
-
-```text
-~/obsidian
-```
-
-If neither path resolves to an existing directory, the Obsidian plugin remains disabled.
-
-The configured notes subdirectory is:
-
-```text
-notes
-```
-
-Render Markdown handles visual Markdown rendering. Obsidian-specific completion is not enabled in this edition; normal LSP, path, buffer, and snippet completion remains available.
-
-## Git
-
-BAT-VIM includes:
-
-- gitsigns for inline Git change signs
-- vim-fugitive for Git commands and status views
-
-Main custom binding:
-
-```text
-Space g g
-```
-
-This opens Lazygit inside BAT-VIM.
-
-You can also use normal Fugitive commands such as:
-
-```vim
-:Git
-:G
-```
-
-## Health and troubleshooting
-
-Run:
-
-```vim
-:SuperHealth
-```
-
-The command name remains `SuperHealth` for compatibility, but the window is branded as BAT-VIM Health.
-
-It performs a quick executable/path-oriented dependency check without running many blocking version subprocesses.
-
-For Neovim's full health diagnostics:
-
-```vim
-:checkhealth
-```
-
-BAT-VIM also exposes its dependency checks through Neovim's standard health interface, so you can run only this configuration's provider with:
-
-```vim
-:checkhealth config
-```
-
-If `:checkhealth` reports `E5009: Invalid $VIMRUNTIME`, first check whether `VIMRUNTIME` was exported by your shell or a wrapper. This is especially easy to notice with an AppImage because its runtime path is normally under `/tmp/.mount_*` while the AppImage is running. From the shell, `unset VIMRUNTIME VIM` and launch Neovim again unless you intentionally manage those variables. Inside Neovim, compare `:echo $VIMRUNTIME` with `:set runtimepath?`; the runtime directory must exist and appear in `runtimepath`.
-
-If pressing `K` used to produce `vim.treesitter.lua: ... attempt to call method 'range' (a nil value)`, that is the Neovim 0.12 versus old nvim-treesitter `master` incompatibility. This edition selects the 0.12 `main` branch automatically and also prevents Render Markdown from attaching to LSP hover `nofile` buffers. After upgrading the config, run `:Lazy sync` and restart Neovim so the Tree-sitter checkout actually changes branch.
-
-On Neovim 0.12+, the rewritten nvim-treesitter branch uses the external `tree-sitter` CLI when it needs to install or update parsers that Neovim does not bundle. Check it with:
-
-```bash
-tree-sitter --version
-```
-
-and inside Neovim:
-
-```vim
-:checkhealth nvim-treesitter
-```
-
-After installing the CLI, you can install the language parsers used by BAT-VIM with:
-
-```vim
-:TSInstall cpp python java bash json yaml toml
-```
-
-Neovim 0.12 already provides some core parsers, including Markdown-related ones, so a missing CLI should not make the editor unusable.
-
-Do not launch Neovim with `-M` when running health checks on affected Neovim 0.12.3 builds; that mode deliberately disables buffer modification and is known to make `:checkhealth` fail.
-
-Other useful troubleshooting commands:
-
-```vim
-:Lazy
-:Mason
-:ConformInfo
-:messages
-```
-
-After the first plugin installation has completed and BAT-VIM has been restarted, you can run the included headless smoke test from the installed configuration directory:
-
-```bash
-cd ~/.config/super_nvim
-unset VIM VIMRUNTIME
-NVIM_APPNAME=super_nvim nvim --headless '+lua dofile("tests/startup.lua")'
-```
-
-A zero exit status means the test found a valid Neovim runtime/runtimepath, the BAT-VIM commands loaded, the BAT-VIM health provider executed, the theme system applied themes, and the core Telescope/Conform/lint/DAP/neotest modules could be loaded. It is still a smoke test, not a substitute for opening representative files and exercising each language toolchain.
-
-### Install configured Mason tools
-
-The configured LSP servers are:
-
-```text
-clangd
-pyright
-lua_ls
-jdtls
-marksman
-```
-
-Common formatter and linter packages can be installed through Mason, for example:
-
-```vim
-:MasonInstall stylua black clang-format shfmt prettier ruff cpplint shellcheck markdownlint
-```
-
-Mason package names and plugin-internal names are not always identical. In particular:
-
-```text
-Mason package: clang-format
-Conform name:  clang_format
-```
-
-### If Telescope live grep fails
-
-Install ripgrep and verify:
-
-```bash
-rg --version
-```
-
-Then retry:
-
-```text
-Space f g
-```
-
-### If Python uses the wrong interpreter
-
-BAT-VIM prefers `<project>/.venv` and then `$VIRTUAL_ENV`.
-
-Check that the intended interpreter exists and is executable:
-
-```bash
-ls -l .venv/bin/python
-```
-
-Then restart the relevant LSP client or restart Neovim after changing environments.
-
-### If C or C++ does not run
-
-For a single file, verify:
-
-```bash
-gcc --version
-g++ --version
-```
-
-For CMake projects, also verify:
-
-```bash
-cmake --version
-```
-
-
-### If Java does not run
-
-Check the tool for the project type:
-
-```bash
-java -version
-mvn -version
-gradle -version
-```
-
-A Gradle project can avoid requiring a globally installed Gradle when it includes an executable `gradlew` wrapper.
-
-### If formatting does not run
-
-Use:
-
-```vim
-:ConformInfo
-```
-
-and verify the formatter executable exists.
-
-You can also run:
-
-```vim
-:SuperHealth
-```
-
-for a quick dependency summary.
-
-## Persistent undo
-
-`undofile` is enabled, so normal Neovim undo history survives restarts when Neovim can write its undo data.
-
-Use:
-
-```text
-Space u
-```
-
-to inspect undo history visually with Undotree.
-
-## Search behavior
-
-BAT-VIM uses:
-
-- case-insensitive searching by default
-- smart-case searching when uppercase letters are present
-- incremental substitution previews
-- centered navigation for `n`, `N`, `Ctrl-d`, and `Ctrl-u`
-
-Example:
-
-```text
-/foo
-```
-
-matches `foo`, `Foo`, and similar case variants.
-
-Searching for:
-
-```text
-/Foo
-```
-
-becomes case-sensitive because the query contains an uppercase letter.
-
-## Splits and UI behavior
-
-BAT-VIM configures:
-
-- new horizontal splits below the current window
-- new vertical splits to the right
-- a global statusline
-- a permanent sign column
-- relative line numbers plus the current absolute line number
-- rounded floating-window borders
-- mouse support
-- persistent cursor-line highlighting
-- no line wrapping by default
-
-Use the `Ctrl-h/j/k/l` mappings to move quickly between splits.
-
-## Plugin management
-
-Plugins are managed by lazy.nvim.
-
-Open the manager with:
-
-```vim
-:Lazy
-```
-
-Useful operations include:
-
-```vim
-:Lazy sync
-:Lazy update
-:Lazy restore
-```
-
-This edition intentionally preserves most pinned plugin commits rather than claiming that every plugin has been upgraded to the latest release.
-
-Tree-sitter is version-aware: BAT-VIM uses the legacy `master` branch on Neovim 0.11 and the rewritten `main` branch on Neovim 0.12+. This avoids the known Neovim 0.12 incompatibility in the old `query_predicates.lua` path. On Neovim 0.12+, installing or updating non-bundled parsers also requires a recent `tree-sitter` CLI; use `:checkhealth nvim-treesitter` to verify it.
-
-After a successful installation, keep the generated `lazy-lock.json` if you want reproducible plugin versions.
-
-## Project detection
-
-Project.nvim is configured in manual mode. It detects projects for the project picker but does not silently change Neovim's working directory behind you.
-
-Detection patterns include:
-
-```text
-.git
-Makefile
-CMakeLists.txt
-pyproject.toml
-package.json
-pom.xml
-build.gradle
-```
-
-Open the project picker with:
-
-```text
-Space f p
-```
-
-## Quick workflow examples
-
-### Python editing workflow
-
-```text
-Space f f    find a Python file
-gd           jump to a definition
-K            inspect a symbol
-Space c f    format
-Space t n    run nearest test
-Space r      run current file
-Space x x    inspect diagnostics
-```
-
-### C/C++ current-file workflow
-
-```text
-Space f p    choose project
-Space f f    find source file
-gd           jump to definition
-K            inspect the symbol under the cursor
-Space c f    format
-Space r      compile and run exactly the current .c/.cpp file
-Space d b    toggle breakpoint
-Space d c    begin debugging
-```
-
-For a multi-file CMake build, open a terminal with `Ctrl-\` and run your normal `cmake --build ...` or project command there.
-
-### Git-oriented workflow
-
-```text
-Space g g    open Lazygit
-Space f g    search project text
-Space s r    search and replace
-Space S s    save session
-```
-
-### Debugging workflow
-
-```text
-Space d b    breakpoint
-Space d c    start/continue
-Space d n    step over
-Space d i    step into
-Space d o    step out
-Space d u    toggle debug UI
-Space d t    terminate
-```
-
-### Theme workflow
-
-```text
-Space c t
-```
-
-Choose a theme and press Enter. The selection is saved for future BAT-VIM launches.
-
-## Commands reference
+## Health, configuration and troubleshooting
 
 | Command | Purpose |
 | --- | --- |
-| `:Theme` | Open theme selector |
-| `:Theme NAME` | Apply and persist a named theme |
-| `:SuperHealth` | Quick BAT-VIM dependency/runtime report |
-| `:CProject [name]` | Scaffold a C/CMake project |
-| `:PyProject [name]` | Scaffold a Python `src`-layout project |
-| `:JavaProject [name]` | Scaffold a Java/Maven project |
-| `:Lazy` | Open lazy.nvim plugin manager |
-| `:Mason` | Open Mason tool manager |
-| `:ConformInfo` | Inspect formatter availability and configuration |
-| `:Telescope` | Access Telescope pickers |
-| `:Trouble` | Access Trouble diagnostics/views |
-| `:MarkdownPreview` | Start Markdown preview |
-| `:MarkdownPreviewStop` | Stop Markdown preview |
-| `:checkhealth` | Run Neovim/plugin health checks |
-| `:messages` | Review Neovim notifications and errors |
-| `:Git` | Open Fugitive Git command/interface |
+| `:SuperHealth` | BAT-VIM dependency checks |
+| `:checkhealth` | Comprehensive Neovim/plugin health checks |
+| `:checkhealth config` | Configuration-specific health checks |
+| `:Lazy` | View plugin manager |
+| `:Lazy sync` | Synchronize installed plugins |
+| `:Mason` | View/manage available language tools |
+| `:ConformInfo` | Examine formatters for current buffer |
+| `:LspInfo` | Inspect active language servers |
 
-## Configuration layout
+**Troubleshooting:**
 
-Important files include:
+- **Missing icons:** install and enable a Nerd Font in your terminal emulator.
+- **Live grep does nothing:** install `rg` and confirm it is on `PATH`.
+- **Clipboard unavailable:** install a platform-appropriate clipboard executable.
+- **LSP not attaching:** inspect `:LspInfo`, `:Mason` and `:checkhealth` and confirm the buffer has the expected filetype.
+- **Parser issues after changing Neovim versions:** run `:Lazy sync`, update Tree-sitter parsers, and restart. The 0.12+ branch can require a working Tree-sitter CLI for parser installs.
+- **Language runner fails:** confirm the relevant compiler/interpreter exists and the current buffer is saved.
+- **`:checkhealth` complains about `$VIMRUNTIME`:** check for stale `VIM`/`VIMRUNTIME` environment variables from shell wrappers or AppImage launches.
 
-```text
-init.lua
-lua/
-  config/
-    assembly.lua
-    autocmds.lua
-    health.lua
-    keymaps.lua
-    options.lua
-    runner.lua
-    scaffolding.lua
-  plugins/
-    completion.lua
-    dap.lua
-    editing.lua
-    git.lua
-    init.lua
-    lint.lua
-    lsp.lua
-    markdown.lua
-    navigation.lua
-    sessions.lua
-    terminal.lua
-    testing.lua
-    treesitter.lua
-    ui.lua
-  custom_snippets.lua
-installer.sh
-lazy-lock.json
-tests/
-docs/
-```
-
-The configuration is intentionally modular. General Neovim behavior lives under `lua/config`, while plugin declarations live under `lua/plugins`.
-
-## Validation
-
-This package includes:
-
-- isolated Lua regression tests
-- installer filesystem tests
-- a headless Neovim startup test intended for CI environments with Neovim and network access
-
-See:
+## Repository organization
 
 ```text
-docs/VALIDATION.md
-docs/CHANGES.md
+super_nvim/
+├── init.lua               # Version gate, lazy.nvim bootstrap, config entry point
+├── installer.sh           # Local installation, dry run, backups
+├── lazy-lock.json         # Pinned plugin revisions
+├── lua/
+│   ├── config/            # Options, keymaps, runtime helpers, health, themes
+│   └── plugins/           # lazy.nvim plugin declarations
+├── ftplugin/              # Filetype-specific settings
+├── docs/                  # Additional documentation
+├── tests/                 # Repository tests
+├── .stylua.toml           # Lua formatter configuration
+└── .luacheckrc            # Lua lint configuration
 ```
 
-Developer checks from the repository root:
+For full detail, read the source. Key mappings can vary when plugins are loaded or updated; this README is a usage guide rather than a substitute for checking live mappings with `:map`.
 
-```bash
-stylua .
-luacheck .
-lua tests/regression.lua
-python3 tests/installer_test.py
-NVIM_APPNAME=super_nvim nvim --headless '+lua dofile("tests/startup.lua")'
-```
+## Contributing and reporting problems
 
-The authoring environment for the refined package did not perform a full interactive plugin integration session, so real debugger sessions, parser compilation, language servers, and external tools should still be validated on the machine where BAT-VIM is installed.
+Open an [issue](https://github.com/Aghavali9/super_nvim/issues) and include your Neovim version, OS, exact reproduction steps, and the relevant output from `:checkhealth`, `:LspInfo`, or `:Lazy`.
 
-## Notes about the restored BAT-VIM branding
+---
 
-The refined edition temporarily replaced the BAT-VIM ASCII dashboard with a compact Super Nvim heading. This package restores the original BAT-VIM header and BAT-VIM naming in the user-facing startup experience while preserving the newer fixes:
-
-- isolated and safer installation
-- persistent theme menu
-- current-file source runner with no target prompt
-- corrected formatting configuration
-- safer project scaffolding
-- improved completion behavior
-- updated LSP mapping behavior
-- improved dependency health checks
-- test coverage and validation files
-
-The technical installer application name remains `super_nvim` so existing isolated installs and paths remain compatible.
+**BAT-VIM** is a personal Neovim configuration. It is intended to be customized; review the included plugins and installer before running third-party code on your machine.
