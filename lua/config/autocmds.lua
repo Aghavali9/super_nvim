@@ -7,9 +7,17 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local client = vim.lsp.get_client_by_id(args.data.client_id)
 		local opts = { buffer = args.buf, noremap = true, silent = true }
 
+		-- Native inlay hints (Neovim 0.10/0.11+)
+		vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })
+
+		-- Buffer-local LSP definition & declaration navigation
 		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "grr", vim.lsp.buf.references, opts) -- preserve native gr* mappings
-		vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", opts)
+		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+
+		-- Native hover with rounded borders
+		vim.keymap.set("n", "K", function()
+			vim.lsp.buf.hover({ border = "rounded" })
+		end, opts)
 
 		if client and client.server_capabilities.renameProvider then
 			vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, opts)
@@ -21,6 +29,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		vim.keymap.set("n", "<leader>fd", function()
 			require("telescope.builtin").diagnostics()
 		end, opts)
+	end,
+})
+
+-- Prevent LuaSnip random cursor jump bug on InsertLeave
+local unlink_grp = vim.api.nvim_create_augroup("SuperLuaSnipUnlink", { clear = true })
+vim.api.nvim_create_autocmd("InsertLeave", {
+	group = unlink_grp,
+	callback = function()
+		local ok, luasnip = pcall(require, "luasnip")
+		if
+			ok
+			and luasnip.session
+			and luasnip.session.current_nodes[vim.api.nvim_get_current_buf()]
+			and not luasnip.session.jump_active
+		then
+			luasnip.unlink_current()
+		end
 	end,
 })
 vim.api.nvim_create_autocmd("VimLeavePre", {

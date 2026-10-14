@@ -1,128 +1,103 @@
 -- lua/plugins/lsp.lua
--- LSP server management (mason) and nvim-lspconfig
-
 return {
-
-	-- ── Fidget (LSP progress notifications) ───────────────────────────────────
 	{
-		"j-hui/fidget.nvim",
-		event = "LspAttach",
-		opts = {
-			progress = {
-				poll_rate = 0,
-				suppress_on_insert = false,
-				ignore_done_already = false,
-				ignore_empty_message = false,
-				display = {
-					render_limit = 16,
-					done_ttl = 3,
-					done_icon = "✔",
-					done_style = "Constant",
-					progress_ttl = math.huge,
-					progress_icon = { pattern = "dots", period = 1 },
-					progress_style = "WarningMsg",
-					group_style = "Title",
-					icon_style = "Question",
-					priority = 30,
-					skip_history = false,
-				},
-			},
-			notification = {
-				poll_rate = 10,
-				filter = vim.log.levels.INFO,
-				history_size = 128,
-				override_vim_notify = false,
-				window = {
-					normal_hl = "Comment",
-					winblend = 0,
-					border = "none",
-					zindex = 45,
-					max_width = 0,
-					max_height = 0,
-					x_padding = 1,
-					y_padding = 0,
-					align = "bottom",
-					relative = "editor",
-				},
-				view = {
-					stack_upwards = true,
-					icon_separator = " ",
-					group_separator = "---",
-					group_separator_hl = "Comment",
-					render_message = function(msg, cnt)
-						msg = cnt == 1 and msg or string.format("(%dx) %s", cnt, msg)
-						return msg
-					end,
-				},
-			},
-			logger = {
-				level = vim.log.levels.WARN,
-				max_size = 10000,
-				float_precision = 0.01,
-				path = string.format("%s/fidget.nvim.log", vim.fn.stdpath("cache")),
+		"folke/trouble.nvim",
+		cmd = "Trouble",
+		opts = { focus = true },
+		keys = {
+			{ "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+			{ "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
+			{ "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
+			{
+				"<leader>cl",
+				"<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
+				desc = "LSP Definitions / References (Trouble)",
 			},
 		},
 	},
-
-	-- ── LSP Saga (richer UI for hover, rename, outline, …) ───────────────────
-	{
-		"nvimdev/lspsaga.nvim",
-		event = "LspAttach",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-			"nvim-tree/nvim-web-devicons",
-		},
-		config = function()
-			require("lspsaga").setup({
-				ui = {
-					border = "rounded",
-					winblend = 0,
-				},
-				hover = {
-					max_width = 0.75,
-				},
-				beacon = {
-					enable = false,
-				},
-				lightbulb = {
-					enable = false,
-					sign = false,
-					virtual_text = false,
-				},
-			})
-
-			local function apply_saga_highlights()
-                for group, target in pairs({ SagaNormal = "NormalFloat", SagaBorder = "FloatBorder",
-                    SagaTitle = "Title", SagaHoverBorder = "FloatBorder", SagaCodeAction = "NormalFloat" }) do
-                    vim.api.nvim_set_hl(0, group, { link = target })
-                end
-            end
-            apply_saga_highlights()
-            vim.api.nvim_create_autocmd("ColorScheme", {
-                group = vim.api.nvim_create_augroup("SuperSagaHighlights", { clear = true }),
-                callback = apply_saga_highlights,
-            })
-		end,
-	},
-
 	{
 		"neovim/nvim-lspconfig",
+		event = { "BufReadPre", "BufNewFile" },
 		dependencies = {
-			{ "mason-org/mason.nvim", config = true },
-			{ "mason-org/mason-lspconfig.nvim" },
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
 		},
 		config = function()
-			require("mason-lspconfig").setup({
-				ensure_installed = {
-					"clangd",
-					"basedpyright",
-					"lua_ls",
-					"jdtls",
-					"bashls",
-				},
-				automatic_enable = false, -- config.lsp owns enablement
+			require("mason").setup({
+				ui = { border = "rounded" },
 			})
-			require("config.lsp")
+
+			local servers = { "lua_ls", "pyright", "clangd", "jdtls", "marksman" }
+
+			require("mason-lspconfig").setup({
+				ensure_installed = servers,
+				automatic_installation = false,
+			})
+
+			local capabilities = vim.lsp.protocol.make_client_capabilities()
+			local ok_blink, blink = pcall(require, "blink.cmp")
+			if ok_blink and blink.get_lsp_capabilities then
+				capabilities = blink.get_lsp_capabilities(capabilities)
+			end
+
+			if vim.lsp.config then
+				vim.lsp.config("*", {
+					capabilities = capabilities,
+					root_markers = { ".git" },
+				})
+
+				vim.lsp.config("lua_ls", {
+					settings = {
+						Lua = {
+							diagnostics = { globals = { "vim" } },
+							workspace = { checkThirdParty = false },
+							telemetry = { enable = false },
+						},
+					},
+				})
+
+				vim.lsp.enable(servers)
+			else
+				local lspconfig = require("lspconfig")
+				for _, server in ipairs(servers) do
+					local opts = { capabilities = capabilities }
+					if server == "lua_ls" then
+						opts.settings = {
+							Lua = {
+								diagnostics = { globals = { "vim" } },
+								workspace = { checkThirdParty = false },
+							},
+						}
+					end
+					lspconfig[server].setup(opts)
+				end
+			end
+
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = vim.api.nvim_create_augroup("SuperNvimLspAttach", { clear = true }),
+				callback = function(args)
+					local bufnr = args.buf
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+
+					-- Critical mappings not covered by Neovim 0.11+ gr* defaults
+					vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = bufnr, desc = "Go to Definition" })
+					vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = bufnr, desc = "Go to Declaration" })
+					vim.keymap.set("n", "K", function()
+						vim.lsp.buf.hover({ border = "rounded" })
+					end, { buffer = bufnr, desc = "Hover Documentation" })
+					vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, { buffer = bufnr, desc = "Rename Symbol" })
+					vim.keymap.set(
+						{ "n", "v" },
+						"<leader>ca",
+						vim.lsp.buf.code_action,
+						{ buffer = bufnr, desc = "Code Action" }
+					)
+
+					if client and client:supports_method("textDocument/inlayHint") then
+						vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+					end
+				end,
+			})
 		end,
 	},
 }

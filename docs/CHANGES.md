@@ -79,3 +79,40 @@ The Tree-sitter rewrite is now adopted only when running Neovim 0.12+, while Neo
 - Catppuccin, Tokyo Night and Kanagawa remain in the persistent selector, while the earlier Habamax/Charcoal, Slate, Quiet, Desert and Morning choices are restored. Rose Pine again uses the original BAT-VIM plugin defaults and is the default for new state.
 - On Neovim 0.12+, BAT-VIM uses the rewritten `nvim-treesitter` `main` branch and native `vim.treesitter.start()`. On 0.11 it retains the old `master` configuration.
 - Render Markdown ignores `nofile` buffers such as LSP hover windows. This prevents pressing `K` from invoking Markdown Tree-sitter rendering inside the hover popup.
+
+## Modernization and Bug-Fix Overhaul
+
+### 1. Snippet `<Tab>` Cursor Jump Fix
+- Fixed random cursor jump bugs in `LuaSnip` by setting `history = false`, `region_check_events = "CursorMoved,CursorHold,InsertEnter"`, and `delete_check_events = "TextChanged,InsertLeave"`.
+- Replaced `luasnip.expand_or_jumpable()` / `jumpable(-1)` with `luasnip.expand_or_locally_jumpable()` / `locally_jumpable(-1)` in `lua/plugins/completion.lua`.
+- Added an `InsertLeave` autocmd in `lua/config/autocmds.lua` to safely call `luasnip.unlink_current()` when the cursor exits insert mode.
+- Retained full integration with `saghen/blink.cmp` (`preset = "super-tab"`), native signatures, and custom snippets in `lua/custom_snippets.lua`.
+
+### 2. Native Neovim 0.11 / 0.12 Modernization
+- Enabled native inlay hints (`vim.lsp.inlay_hint.enable(true, { bufnr = args.buf })`) on `LspAttach`.
+- Restored explicit buffer-local `gd` (`vim.lsp.buf.definition`) and `gD` (`vim.lsp.buf.declaration`) bindings on `LspAttach` because vanilla Neovim's `gd` is naive regex search rather than LSP definition lookup.
+- Removed redundant `lspsaga.nvim` dependency and mapped `K` to native `vim.lsp.buf.hover({ border = "rounded" })`.
+- Preserved custom `<leader>` actions (`<leader>cr`, `<leader>ca`, `<leader>fd`) while honoring Neovim 0.11+ native `gr*` defaults (`grr`, `gra`, `grn`, `gri`, `gO`).
+- Replaced `nvim-ufo` with native Treesitter folding in `lua/config/options.lua` (`foldmethod = "expr"`, `foldexpr = "v:lua.vim.treesitter.foldexpr()"`, `foldtext = ""`).
+- Replaced `Comment.nvim` in `lua/plugins/editing.lua` with Neovim's built-in `gc`/`gcc` commenting.
+
+### 3. Consolidated Plugin Config Architecture
+- Eliminated eager `lua/config/*` plugin imports before `lazy.nvim` loads.
+- Inlined `lua/config/snippets.lua` into `lua/plugins/completion.lua` and removed `lua/config/snippets.lua`.
+- Inlined `lua/config/lsp.lua` into `lua/plugins/lsp.lua` with native `vim.lsp.config()` and `vim.lsp.enable()` on Neovim 0.11+, removing `lua/config/lsp.lua`.
+- Merged `lua/config/telescope.lua` into `lua/plugins/navigation.lua` and removed `lua/config/telescope.lua`.
+- Merged `lua/config/lint.lua` into `lua/plugins/lint.lua` and removed `lua/config/lint.lua`.
+- Merged `lua/config/formatting.lua` into `lua/plugins/editing.lua` and removed `lua/config/formatting.lua`.
+- Merged `lua/config/ui.lua` (Alpha dashboard) and `lua/config/theme.lua` (theme state/persistence/commands) into `lua/plugins/ui.lua`.
+- Merged `lua/plugins/lazygit.lua` into `lua/plugins/git.lua` and removed `lua/plugins/lazygit.lua`.
+- `init.lua` now only requires core non-plugin modules (`options`, `keymaps`, `autocmds`, `health`, `runner`, `assembly`, `scaffolding`).
+
+### 4. Buffer Scoping Audit (`ftplugin/*.lua`)
+- Audited all language filetype plugins (`c.lua`, `cpp.lua`, `java.lua`, `lua.lua`, `markdown.lua`, `python.lua`).
+- Verified all custom keymaps enforce `buffer = true`.
+
+### 5. Fedora Installer and Repo Hygiene
+- Removed tracked Python bytecode caches from git (`tests/__pycache__`) and added comprehensive `.gitignore`.
+- Updated `installer.sh` to support `--check-deps` with clean Fedora `dnf` package names (`neovim`, `ripgrep`, `fd-find`, `gcc`, `gcc-c++`, `make`, `python3-pytest`, `stylua`, `luacheck`).
+- Updated `tests/installer_test.py` with standard `pytest` test collection and assertions matching the consolidated architecture.
+

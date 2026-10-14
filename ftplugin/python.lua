@@ -12,18 +12,18 @@ end
 -- ── Run & Test ───────────────────────────────────────────────────────────────
 
 vim.keymap.set("n", "<leader>mt", function()
-    local r = require("config.runner")
-    r.terminal({ r.python(r.root()), "-m", "pytest", "-v" }, r.root())
+	local r = require("config.runner")
+	r.terminal({ r.python(r.root()), "-m", "pytest", "-v" }, r.root())
 end, { buffer = true, desc = "Python: project tests" })
 
 vim.keymap.set("n", "<leader>mv", function()
-    local r = require("config.runner")
-    local root = r.root()
-    if vim.fn.isdirectory(root .. "/.venv") == 1 then
-        vim.notify("Runner interpreter: " .. r.python(root) .. " (restart LSP after environment changes)")
-    else
-        r.terminal({ "python3", "-m", "venv", root .. "/.venv" }, root)
-    end
+	local r = require("config.runner")
+	local root = r.root()
+	if vim.fn.isdirectory(root .. "/.venv") == 1 then
+		vim.notify("Runner interpreter: " .. r.python(root) .. " (restart LSP after environment changes)")
+	else
+		r.terminal({ "python3", "-m", "venv", root .. "/.venv" }, root)
+	end
 end, { buffer = true, desc = "Python: create / inspect project venv" })
 
 -- ── Code-generation ──────────────────────────────────────────────────────────

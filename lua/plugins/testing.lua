@@ -8,19 +8,55 @@ return {
 		"nvim-neotest/neotest",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
-            "nvim-neotest/nvim-nio",
+			"nvim-neotest/nvim-nio",
 			"antoinemadec/FixCursorHold.nvim",
 			"nvim-treesitter/nvim-treesitter",
 			-- Python adapter (pytest / unittest)
 			"nvim-neotest/neotest-python",
 		},
 		keys = {
-			{ "<leader>tn", function() require("neotest").run.run() end,                            desc = "Test: Run Nearest" },
-			{ "<leader>tf", function() require("neotest").run.run(vim.fn.expand("%")) end,           desc = "Test: Run File" },
-			{ "<leader>ts", function() require("neotest").run.run(vim.fn.getcwd()) end,              desc = "Test: Run Suite" },
-			{ "<leader>to", function() require("neotest").output_panel.toggle() end,                 desc = "Test: Output Panel" },
-			{ "<leader>tS", function() require("neotest").summary.toggle() end,                     desc = "Test: Summary" },
-			{ "<leader>tx", function() require("neotest").run.stop() end,                            desc = "Test: Stop" },
+			{
+				"<leader>tn",
+				function()
+					require("neotest").run.run()
+				end,
+				desc = "Test: Run Nearest",
+			},
+			{
+				"<leader>tf",
+				function()
+					require("neotest").run.run(vim.fn.expand("%"))
+				end,
+				desc = "Test: Run File",
+			},
+			{
+				"<leader>ts",
+				function()
+					require("neotest").run.run(vim.fn.getcwd())
+				end,
+				desc = "Test: Run Suite",
+			},
+			{
+				"<leader>to",
+				function()
+					require("neotest").output_panel.toggle()
+				end,
+				desc = "Test: Output Panel",
+			},
+			{
+				"<leader>tS",
+				function()
+					require("neotest").summary.toggle()
+				end,
+				desc = "Test: Summary",
+			},
+			{
+				"<leader>tx",
+				function()
+					require("neotest").run.stop()
+				end,
+				desc = "Test: Stop",
+			},
 		},
 		config = function()
 			require("neotest").setup({

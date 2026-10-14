@@ -27,7 +27,16 @@ vim.keymap.set("n", "<leader>mt", function()
 		local cols = tonumber(parts[1])
 		local rows = tonumber(parts[2])
 
-		if not cols or not rows or cols < 1 or rows < 1 or cols > 50 or rows > 500 or math.floor(cols) ~= cols or math.floor(rows) ~= rows then
+		if
+			not cols
+			or not rows
+			or cols < 1
+			or rows < 1
+			or cols > 50
+			or rows > 500
+			or math.floor(cols) ~= cols
+			or math.floor(rows) ~= rows
+		then
 			vim.notify("Use 1–50 columns and 1–500 rows", vim.log.levels.ERROR)
 			return
 		end
@@ -67,5 +76,5 @@ end, { buffer = true, desc = "Markdown table generator" })
 
 -- Use the Markdown formatter so alignment markers, escapes and Unicode survive.
 vim.keymap.set("n", "<leader>ma", function()
-    require("conform").format({ async = true, lsp_format = "fallback" })
+	require("conform").format({ async = true, lsp_format = "fallback" })
 end, { buffer = true, desc = "Markdown: format document (including tables)" })

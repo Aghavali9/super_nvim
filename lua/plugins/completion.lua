@@ -1,101 +1,92 @@
 -- lua/plugins/completion.lua
--- blink.cmp fast completion engine + LuaSnip snippets + autopairs
-
 return {
 	{
-		"saghen/blink.cmp",
-		version = "*",
-		event = { "BufReadPre", "BufNewFile", "InsertEnter" },
+		"L3MON4D3/LuaSnip",
+		lazy = true,
 		dependencies = {
-			{
-				"L3MON4D3/LuaSnip",
-				version = "v2.*",
-				build = "make install_jsregexp",
-				dependencies = { "rafamadriz/friendly-snippets" },
-				config = function()
-					local luasnip = require("luasnip")
-					require("luasnip.loaders.from_vscode").lazy_load()
+			"rafamadriz/friendly-snippets",
+		},
+		config = function()
+			local ls = require("luasnip")
+			ls.config.setup({
+				history = false, -- Never jump back into an already-exited snippet
+				updateevents = "TextChanged,TextChangedI",
+				region_check_events = "CursorMoved,CursorHold,InsertEnter",
+				delete_check_events = "TextChanged,InsertLeave",
+				enable_autosnippets = true,
+			})
 
-					local ok1, custom_snips = pcall(require, "custom_snippets")
-					if ok1 and type(custom_snips) == "function" then
-						custom_snips(luasnip)
-					end
-					local ok2, err2 = pcall(require, "config.snippets")
-					if not ok2 then
-						vim.notify("config.snippets failed to load: " .. err2, vim.log.levels.WARN)
-					end
-
-					vim.keymap.set({ "i", "s" }, "<C-k>", function()
-						if luasnip.expand_or_jumpable() then
-							luasnip.expand_or_jump()
-						end
-					end, { silent = true, desc = "Snippet jump forward" })
-
-					vim.keymap.set({ "i", "s" }, "<C-j>", function()
-						if luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						end
-					end, { silent = true, desc = "Snippet jump backward" })
-				end,
-			},
-			"windwp/nvim-autopairs",
+			require("luasnip.loaders.from_vscode").lazy_load()
+			local ok_custom, custom = pcall(require, "custom_snippets")
+			if ok_custom and type(custom) == "function" then
+				pcall(custom, ls)
+			end
+		end,
+	},
+	{
+		"saghen/blink.cmp",
+		version = "1.*",
+		event = { "InsertEnter", "CmdlineEnter" },
+		dependencies = {
+			"L3MON4D3/LuaSnip",
+			"rafamadriz/friendly-snippets",
 		},
 		opts = {
+			snippets = { preset = "luasnip" },
 			keymap = {
-				preset = "none",
-				["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
-				["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
-				["<CR>"] = { "accept", "fallback" },
-				["<Up>"] = { "select_prev", "fallback" },
-				["<Down>"] = { "select_next", "fallback" },
-				["<C-Space>"] = { "show", "show_documentation", "hide_documentation" },
-				["<C-e>"] = { "hide", "fallback" },
-				["<C-b>"] = { "scroll_documentation_up", "fallback" },
-				["<C-f>"] = { "scroll_documentation_down", "fallback" },
-			},
-			completion = {
-                list = { selection = { preselect = false, auto_insert = false } },
-				ghost_text = { enabled = true },
-				documentation = {
-					auto_show = true,
-					auto_show_delay_ms = 500,
-					window = {
-						border = "rounded",
-						max_width = 70,
-						max_height = 20,
-						winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
-					},
+				preset = "super-tab",
+				["<Tab>"] = {
+					function(cmp)
+						if cmp.is_visible() then
+							return cmp.accept()
+						end
+						local ok, ls = pcall(require, "luasnip")
+						if ok then
+							if ls.expand_or_locally_jumpable() then
+								return ls.expand_or_jump()
+							elseif ls.in_snippet() and not ls.locally_jumpable(1) then
+								ls.unlink_current()
+							end
+						end
+					end,
+					"snippet_forward",
+					"fallback",
 				},
-				menu = {
-					border = "rounded",
-					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:Visual,Search:None",
-					draw = {
-						treesitter = { "lsp" },
-						columns = { { "kind_icon" }, { "label", "label_description", gap = 1 } },
-					},
+				["<S-Tab>"] = {
+					function(cmp)
+						if cmp.is_visible() then
+							return cmp.select_prev()
+						end
+						local ok, ls = pcall(require, "luasnip")
+						if ok and ls.locally_jumpable(-1) then
+							return ls.jump(-1)
+						end
+					end,
+					"snippet_backward",
+					"fallback",
 				},
 			},
 			appearance = {
 				nerd_font_variant = "mono",
 			},
-			snippets = { preset = "luasnip" },
-			sources = {
-				default = { "lsp", "path", "snippets", "buffer" },
+			completion = {
+				accept = { auto_brackets = { enabled = true } },
+				documentation = {
+					auto_show = true,
+					auto_show_delay_ms = 200,
+					window = { border = "rounded" },
+				},
+				menu = {
+					border = "rounded",
+				},
 			},
 			signature = {
 				enabled = true,
-				window = {
-					border = "rounded",
-					show_documentation = false, -- keep signature popups compact
-					max_width = 80,
-					max_height = 15,
-					winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
-				},
+				window = { border = "rounded" },
+			},
+			sources = {
+				default = { "lsp", "path", "snippets", "buffer" },
 			},
 		},
-		config = function(_, opts)
-			require("nvim-autopairs").setup({})
-			require("blink.cmp").setup(opts)
-		end,
 	},
 }

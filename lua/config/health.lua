@@ -103,13 +103,20 @@ local function run_checks()
 	-- Active shell -------------------------------------------------------------
 	local shell = vim.o.shell
 	local shell_ok = shell ~= "" and vim.fn.executable(shell) == 1
-	add(shell_ok and "ok" or "warn", "Neovim terminal shell", shell_ok and shell or "configured shell is not executable: " .. tostring(shell))
+	add(
+		shell_ok and "ok" or "warn",
+		"Neovim terminal shell",
+		shell_ok and shell or "configured shell is not executable: " .. tostring(shell)
+	)
 
 	-- Neovim 0.12 nvim-treesitter main uses the tree-sitter CLI to install/update parsers.
 	if vim.fn.has("nvim-0.12") == 1 then
 		local ts_ok, ts_path = check_exe("tree-sitter")
-		add(ts_ok and "ok" or "warn", "tree-sitter CLI (Neovim 0.12 parser management)",
-			ts_ok and ts_path or "not found - required to install/update non-bundled parsers with nvim-treesitter main")
+		add(
+			ts_ok and "ok" or "warn",
+			"tree-sitter CLI (Neovim 0.12 parser management)",
+			ts_ok and ts_path or "not found - required to install/update non-bundled parsers with nvim-treesitter main"
+		)
 	end
 
 	-- Optional / language toolchains -------------------------------------------

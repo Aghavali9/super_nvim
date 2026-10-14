@@ -56,6 +56,15 @@ vim.opt.confirm = true
 vim.opt.inccommand = "split"
 vim.opt.winborder = "rounded"
 vim.opt.laststatus = 3
+
+-- Native Treesitter folding
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.foldtext = ""
+vim.opt.foldlevel = 99
+vim.opt.foldlevelstart = 99
+vim.opt.foldenable = true
+
 vim.diagnostic.config({
 	severity_sort = true,
 	update_in_insert = false,

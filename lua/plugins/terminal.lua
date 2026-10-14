@@ -1,37 +1,62 @@
 -- lua/plugins/terminal.lua
--- Floating / split terminal with toggleterm.nvim.
--- Primary toggle: <C-\>  (works in normal, insert, and terminal mode)
--- Additional modes via <leader>T* namespace (capital T to avoid collisions
--- with the testing <leader>t* namespace).
-
 return {
 	{
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		keys = {
-			-- The open_mapping below also covers <C-\> globally,
-			-- but listing it here ensures lazy.nvim knows when to load the plugin.
-			{ [[<C-\>]],    "<cmd>ToggleTerm<cr>",                        mode = { "n", "i", "t" }, desc = "Terminal: Toggle" },
-			{ "<leader>Th", "<cmd>ToggleTerm direction=horizontal<cr>",   desc = "Terminal: Horizontal" },
-			{ "<leader>Tv", "<cmd>ToggleTerm direction=vertical<cr>",     desc = "Terminal: Vertical" },
-			{ "<leader>Tf", "<cmd>ToggleTerm direction=float<cr>",        desc = "Terminal: Float" },
-		},
+		"folke/snacks.nvim",
+		priority = 1000,
+		lazy = false,
 		opts = {
-			open_mapping    = [[<C-\>]],
-			hide_numbers    = true,
-			shade_terminals = true,
-			persist_size    = true,
-			direction       = "float",
-			shell = vim.o.shell,
-			size = function(term)
-				if term.direction == "horizontal" then
-					return 15
-				elseif term.direction == "vertical" then
-					return math.floor(vim.o.columns * 0.4)
-				end
-			end,
-			float_opts = {
-				border = "curved",
+			bigfile = { enabled = true },
+			quickfile = { enabled = true },
+			indent = { enabled = true },
+			input = { enabled = true },
+			notifier = { enabled = true, timeout = 3000 },
+			terminal = {
+				enabled = true,
+				win = { style = "float", border = "rounded" },
+			},
+			lazygit = {
+				enabled = true,
+				configure = true,
+			},
+			words = { enabled = true },
+		},
+		keys = {
+			{
+				"<C-\\>",
+				function()
+					Snacks.terminal.toggle()
+				end,
+				desc = "Toggle Floating Terminal",
+				mode = { "n", "t" },
+			},
+			{
+				"<leader>tt",
+				function()
+					Snacks.terminal.toggle(nil, { win = { style = "split", position = "bottom", height = 0.3 } })
+				end,
+				desc = "Toggle Horizontal Split Terminal",
+				mode = { "n", "t" },
+			},
+			{
+				"<leader>gg",
+				function()
+					Snacks.lazygit()
+				end,
+				desc = "LazyGit (Snacks)",
+			},
+			{
+				"<leader>un",
+				function()
+					Snacks.notifier.hide()
+				end,
+				desc = "Dismiss All Notifications",
+			},
+			{
+				"<leader>bd",
+				function()
+					Snacks.bufdelete()
+				end,
+				desc = "Delete Buffer Without Closing Split",
 			},
 		},
 	},

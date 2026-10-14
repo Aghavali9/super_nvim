@@ -6,6 +6,7 @@ std = "lua51"
 -- Expose the Neovim global and its sub-tables so luacheck doesn't flag them
 globals = {
 	"vim",
+	"Snacks",
 }
 
 -- Don't enforce a hard line-length limit (stylua handles formatting)

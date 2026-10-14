@@ -1,126 +1,84 @@
 -- lua/plugins/navigation.lua
--- Telescope fuzzy-finder, Harpoon file-marks, and Oil file manager
-
 return {
-
-	-- ── Oil (file manager) ────────────────────────────────────────────────────
 	{
 		"stevearc/oil.nvim",
-		lazy = false, -- to prevent lazy-loading from 'keys'
+		lazy = false,
 		dependencies = { "nvim-tree/nvim-web-devicons" },
-		keys = {
-			{
-				"<leader>e",
-				function()
-					require("oil").open()
-				end,
-				desc = "Explorer (Oil)",
+		opts = {
+			default_file_explorer = true,
+			delete_to_trash = true,
+			skip_confirm_for_simple_edits = true,
+			view_options = {
+				show_hidden = true,
 			},
-			{
-				"-",
-				function()
-					require("oil").open()
-				end,
-				desc = "Open parent directory (Oil)",
-			},
-		},
-		config = function()
-			require("oil").setup()
-		end,
-	},
-
-	-- ── Telescope ─────────────────────────────────────────────────────────────
-	{
-		"nvim-telescope/telescope.nvim",
-		branch = "master",
-		cmd = "Telescope",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			{
-				"nvim-telescope/telescope-fzf-native.nvim",
-				build = "make",
-				cond = function()
-					return vim.fn.executable("make") == 1
-				end,
+			float = {
+				padding = 2,
+				max_width = 90,
+				max_height = 30,
+				border = "rounded",
 			},
 		},
 		keys = {
-			{
-				"<leader>ff",
-				function()
-					require("telescope.builtin").find_files()
-				end,
-				desc = "Find files",
-			},
-			{
-				"<leader>fg",
-				function()
-					require("telescope.builtin").live_grep()
-				end,
-				desc = "Live grep",
-			},
-			{
-				"<leader>fb",
-				function()
-					require("telescope.builtin").buffers()
-				end,
-				desc = "Find buffers",
-			},
+			{ "-", "<CMD>Oil<CR>", desc = "Open Parent Directory (Oil)" },
+			{ "<leader>-", "<CMD>Oil --float<CR>", desc = "Open Floating Oil Explorer" },
 		},
-		config = function()
-			require("config.telescope")
-		end,
 	},
-	-- ── Harpoon ───────────────────────────────────────────────────────────────
 	{
-		"ThePrimeagen/harpoon",
-		branch = "harpoon2",
-		dependencies = { "nvim-lua/plenary.nvim" },
+		"folke/flash.nvim",
+		event = "VeryLazy",
 		opts = {},
 		keys = {
 			{
-				"<leader>a",
+				"s",
+				mode = { "n", "x", "o" },
 				function()
-					require("harpoon"):list():add()
+					require("flash").jump()
 				end,
-				desc = "Harpoon add file",
+				desc = "Flash Jump",
 			},
 			{
-				"<C-e>",
+				"S",
+				mode = { "n", "x", "o" },
 				function()
-					local harpoon = require("harpoon")
-					harpoon.ui:toggle_quick_menu(harpoon:list())
+					require("flash").treesitter()
 				end,
-				desc = "Harpoon menu",
-			},
-			{
-				"<leader>1",
-				function()
-					require("harpoon"):list():select(1)
-				end,
-				desc = "Harpoon 1",
-			},
-			{
-				"<leader>2",
-				function()
-					require("harpoon"):list():select(2)
-				end,
-				desc = "Harpoon 2",
-			},
-			{
-				"<leader>3",
-				function()
-					require("harpoon"):list():select(3)
-				end,
-				desc = "Harpoon 3",
-			},
-			{
-				"<leader>4",
-				function()
-					require("harpoon"):list():select(4)
-				end,
-				desc = "Harpoon 4",
+				desc = "Flash Treesitter Node",
 			},
 		},
+	},
+	{
+		"nvim-telescope/telescope.nvim",
+		cmd = "Telescope",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+			"nvim-telescope/telescope-ui-select.nvim",
+		},
+		keys = {
+			{ "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
+			{ "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
+			{ "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+			{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Tags" },
+			{ "<leader>fd", "<cmd>Telescope diagnostics<cr>", desc = "Diagnostics" },
+		},
+		config = function()
+			local telescope = require("telescope")
+			telescope.setup({
+				defaults = {
+					path_display = { "truncate" },
+					sorting_strategy = "ascending",
+					layout_config = {
+						horizontal = { prompt_position = "top", preview_width = 0.55 },
+					},
+				},
+				extensions = {
+					["ui-select"] = {
+						require("telescope.themes").get_dropdown({}),
+					},
+				},
+			})
+			pcall(telescope.load_extension, "fzf")
+			pcall(telescope.load_extension, "ui-select")
+		end,
 	},
 }

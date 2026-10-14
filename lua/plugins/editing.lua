@@ -1,45 +1,88 @@
 -- lua/plugins/editing.lua
--- Formatting, undo history, commenting, and surround pairs
-
 return {
-
-	-- ── Formatting (conform) ──────────────────────────────────────────────────
 	{
 		"stevearc/conform.nvim",
-		event = "BufWritePre",
-        cmd = "ConformInfo",
-        keys = {
-            { "<leader>cf", function() require("conform").format({ async = true, lsp_format = "fallback" }) end,
-                mode = { "n", "v" }, desc = "Format buffer / selection" },
-            { "<leader>cF", function()
-                vim.g.disable_autoformat = not vim.g.disable_autoformat
-                vim.notify("Format on save: " .. (vim.g.disable_autoformat and "off" or "on"))
-            end, desc = "Toggle format on save" },
-        },
-		config = function()
-			require("config.formatting")
+		event = { "BufWritePre" },
+		cmd = { "ConformInfo" },
+		keys = {
+			{
+				"<leader>cf",
+				function()
+					require("conform").format({ async = true, lsp_format = "fallback" })
+				end,
+				mode = { "n", "v" },
+				desc = "Format Buffer",
+			},
+		},
+		opts = {
+			formatters_by_ft = {
+				lua = { "stylua" },
+				python = { "isort", "black" },
+				c = { "clang_format" },
+				cpp = { "clang_format" },
+				markdown = { "prettier" },
+			},
+			format_on_save = function(bufnr)
+				if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
+					return
+				end
+				return { timeout_ms = 1000, lsp_format = "fallback" }
+			end,
+		},
+		config = function(_, opts)
+			require("conform").setup(opts)
 		end,
 	},
-
-	-- ── Undo history tree ─────────────────────────────────────────────────────
-	{ "mbbill/undotree", cmd = "UndotreeToggle" },
-
-	-- ── Smart commenting  (gcc = line, gc = visual block) ────────────────────
 	{
-		"numToStr/Comment.nvim",
-		keys = {
-			{ "gcc", mode = "n", desc = "Toggle line comment" },
-			{ "gc",  mode = { "n", "v" }, desc = "Toggle comment" },
-			{ "gb",  mode = { "n", "v" }, desc = "Toggle block comment" },
+		"stevearc/overseer.nvim",
+		cmd = {
+			"OverseerOpen",
+			"OverseerClose",
+			"OverseerToggle",
+			"OverseerRun",
+			"OverseerBuild",
+			"OverseerTaskAction",
 		},
-		config = true,
+		opts = {
+			strategy = "terminal",
+			templates = { "builtin" },
+			task_list = {
+				direction = "bottom",
+				min_height = 12,
+				max_height = 20,
+				default_detail = 1,
+			},
+		},
+		keys = {
+			{ "<leader>or", "<cmd>OverseerRun<cr>", desc = "Overseer: Run Task" },
+			{ "<leader>ot", "<cmd>OverseerToggle<cr>", desc = "Overseer: Toggle Task List" },
+			{ "<leader>oa", "<cmd>OverseerTaskAction<cr>", desc = "Overseer: Task Action" },
+		},
 	},
-
-	-- ── Surround pairs  (ys / ds / cs) ───────────────────────────────────────
+	{
+		"MagicDuck/grug-far.nvim",
+		cmd = "GrugFar",
+		opts = { headerMaxWidth = 80 },
+		keys = {
+			{
+				"<leader>sr",
+				function()
+					require("grug-far").open({ transient = true })
+				end,
+				mode = { "n", "v" },
+				desc = "Search and Replace (Grug-Far)",
+			},
+		},
+	},
+	{
+		"windwp/nvim-autopairs",
+		event = "InsertEnter",
+		opts = { check_ts = true },
+	},
 	{
 		"kylechui/nvim-surround",
 		version = "*",
 		event = "VeryLazy",
-		config = true,
+		opts = {},
 	},
 }

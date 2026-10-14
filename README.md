@@ -10,13 +10,14 @@ The configuration includes:
 - Oil file management
 - Harpoon quick file marks
 - Native Neovim LSP with Mason-managed servers
-- Blink completion and LuaSnip snippets
+- Blink completion with super-tab preset and LuaSnip snippets
 - Conform formatting and nvim-lint linting
 - nvim-dap debugging
 - neotest test running
-- ToggleTerm terminals
+- ToggleTerm terminals and Lazygit integration
 - Persistent sessions
-- UFO code folding
+- Native Treesitter code folding
+- Native commenting (`gc`, `gcc`)
 - C, C++, Python, Java, Lua, Shell, Markdown, JSON, and YAML tooling
 - Current-file run commands for C, C++, Python, Java, shell scripts, and Lua
 - Safe project scaffolding commands for C, Python, and Java
@@ -59,12 +60,13 @@ Recommended external tools depend on the features you use:
 Extract the archive, enter the `super_nvim-main` directory, and run:
 
 ```bash
+bash installer.sh --check-deps
 bash installer.sh --dry-run
 bash installer.sh
 NVIM_APPNAME=super_nvim nvim
 ```
 
-The installer copies this local package. It does not clone a different remote version, install operating-system packages, use `sudo`, or add PPAs.
+The installer verifies dependencies with `--check-deps` (reporting package hints for Fedora, Ubuntu/Debian, and Arch) and copies this local package. It does not clone a different remote version, install operating-system packages, use `sudo`, or add PPAs.
 
 On first launch, Lazy will install the configured plugins. Allow installation to finish, then restart BAT-VIM with:
 
@@ -271,14 +273,15 @@ These mappings become buffer-local when an LSP server attaches.
 
 | Mode | Key | Action |
 | --- | --- | --- |
-| Normal | `g d` | Go to definition |
-| Normal | `g r r` | List references |
-| Normal | `K` | Show LSP hover documentation through Lspsaga |
+| Normal | `g d` | Go to definition (`vim.lsp.buf.definition`) |
+| Normal | `g D` | Go to declaration (`vim.lsp.buf.declaration`) |
+| Normal | `g r r` | List references (native Neovim 0.11+) |
+| Normal | `K` | Show LSP hover documentation with rounded borders (`vim.lsp.buf.hover`) |
 | Normal | `Space c r` | Rename symbol, when supported by the server |
 | Normal | `Space c a` | Show available code actions, when supported |
 | Normal | `Space f d` | Telescope diagnostics picker |
 
-`grr` is intentionally used instead of `gr` so Neovim 0.11's native `gr*` mappings remain available.
+`grr` (references), `gra` (code actions), `gri` (implementations), `grn` (rename), and `gO` (document symbols) are native Neovim 0.11+ defaults. Buffer-local `gd`, `gD`, and `K` are explicitly bound on `LspAttach` to ensure reliable LSP navigation and hover documentation with rounded borders.
 
 Configured LSP servers:
 
@@ -388,13 +391,13 @@ Useful formatting diagnostics:
 
 ### Comments
 
-Comment.nvim provides:
+Neovim's built-in commenting provides native comment toggling without external plugin overhead:
 
 | Mode | Key | Action |
 | --- | --- | --- |
 | Normal | `g c c` | Toggle comment on the current line |
 | Normal / Visual | `g c` | Toggle linewise comment using an operator or visual selection |
-| Normal / Visual | `g b` | Toggle block comment |
+| Normal / Visual | `g b` | Toggle block comment (with motion/selection) |
 
 Examples:
 
@@ -541,19 +544,15 @@ to restore it.
 
 ### Code folding
 
-BAT-VIM uses nvim-ufo while preserving standard Vim fold controls.
+BAT-VIM uses Neovim's native Treesitter folding (`foldmethod = "expr"`, `foldexpr = "v:lua.vim.treesitter.foldexpr()"`, `foldtext = ""`) with standard Vim fold controls:
 
 | Mode | Key | Action |
 | --- | --- | --- |
 | Normal | `zR` | Open all folds |
 | Normal | `zM` | Close all folds |
-| Normal | `zK` | Peek folded lines under the cursor; if no fold exists, show LSP hover |
-| Normal | `zJ` | Enter the active fold peek window |
+| Normal | `za` | Standard Vim: toggle fold |
 | Normal | `zo` | Standard Vim: open fold |
 | Normal | `zc` | Standard Vim: close fold |
-| Normal | `za` | Standard Vim: toggle fold |
-
-Inside the UFO preview window, `Ctrl-u` and `Ctrl-d` scroll the preview.
 
 ## Theme system
 
@@ -1223,25 +1222,19 @@ Important files include:
 init.lua
 lua/
   config/
+    assembly.lua
     autocmds.lua
-    formatting.lua
     health.lua
     keymaps.lua
-    lint.lua
-    lsp.lua
     options.lua
     runner.lua
     scaffolding.lua
-    snippets.lua
-    telescope.lua
-    theme.lua
-    ui.lua
   plugins/
     completion.lua
     dap.lua
     editing.lua
-    folds.lua
     git.lua
+    init.lua
     lint.lua
     lsp.lua
     markdown.lua
@@ -1251,6 +1244,7 @@ lua/
     testing.lua
     treesitter.lua
     ui.lua
+  custom_snippets.lua
 installer.sh
 lazy-lock.json
 tests/
