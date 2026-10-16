@@ -9,6 +9,7 @@ local state = {
 	compiler = "gcc",
 	opt = "0",
 	selection = nil,
+	view_kind = nil,
 }
 
 local function valid(b)
@@ -21,13 +22,7 @@ local function notify(message, level)
 	vim.notify(message, level or vim.log.levels.INFO, { title = "Assembly" })
 end
 local function source_text()
-	local lines
-	if state.selection then
-		lines = state.selection
-	else
-		lines = vim.api.nvim_buf_get_lines(state.source, 0, -1, false)
-	end
-	return table.concat(lines, "\n") .. "\n"
+    return table.concat(vim.api.nvim_buf_get_lines(state.source, 0, -1, false), "\n") .. "\n"
 end
 local function output_buffer()
 	if valid(state.output) then
@@ -47,12 +42,85 @@ local function write_output(lines)
 	vim.api.nvim_buf_set_lines(b, 0, -1, false, lines)
 	vim.bo[b].modifiable = false
 end
+-- Compiler debug directives (.loc) map instructions to source lines. For a
+-- visual selection we display complete functions that touch the chosen lines;
+-- compiling isolated statements would lose their includes, locals and types.
+local function relevant_assembly(content, first, last)
+    local lines = vim.split(content, "\n", { plain = true })
+    local blocks = {}
+    local active = nil
+    local current_line = nil
+    for i, line in ipairs(lines) do
+        local name = line:match('^%s*%.type%s+([^,%s]+)%s*,%s*@function')
+        if name and not active then
+            active = { name = name, start_line = i, matches = false }
+        end
+        local file_id, line_number = line:match('^%s*%.loc%s+(%d+)%s+(%d+)')
+        if active and file_id == "1" and line_number then
+            current_line = tonumber(line_number)
+            if current_line >= first and current_line <= last then
+                active.matches = true
+            end
+        end
+        if active and line:match('^%s*%.size%s+') then
+            active.end_line = i
+            blocks[#blocks + 1] = active
+            active = nil
+            current_line = nil
+        end
+    end
+    local result = {
+        string.format('# Assembly for source lines %d–%d (whole containing functions)', first, last),
+        '# Source selection is compiled in its original file context.',
+        '',
+    }
+    local count = 0
+    for _, block in ipairs(blocks) do
+        if block.matches then
+            count = count + 1
+            vim.list_extend(result, vim.list_slice(lines, block.start_line, block.end_line))
+            result[#result + 1] = ''
+        end
+    end
+    if count == 0 then
+        return nil
+    end
+    return result
+end
+
+-- Keep function instructions and labels; hide DWARF and assembler metadata.
+-- Run after source-line matching, which still requires .loc directives.
+local function readable_assembly(content)
+    local lines = type(content) == "table" and content or vim.split(content, "\n", { plain = true })
+    local out = { "; Assembly (metadata hidden)", "" }
+    local inside = false
+    for _, line in ipairs(lines) do
+        if line:match("^%s*%.type%s+[^,]+,%s*[@%%]function") then
+            inside = true
+        elseif inside and line:match("^%s*%.size%s+") then
+            inside = false
+            out[#out + 1] = ""
+        elseif inside then
+            local clean = line:gsub("%s+#.*$", ""):gsub("%s+$", "")
+            if clean:match("^%s*[%w_.$]+:%s*$") or
+               (clean:match("^%s+[%a][%w.]*%s") and not clean:match("^%s*%.")) then
+                out[#out + 1] = clean
+            end
+        end
+    end
+    if #out == 2 then
+        return { "; No compiler function bodies identified; showing original output:", unpack(lines) }
+    end
+    return out
+end
+
 local function refresh()
 	if not valid(state.source) then
 		return
 	end
 	state.generation = state.generation + 1
 	local generation = state.generation
+	local selection = state.selection
 	local ext = vim.bo[state.source].filetype == "cpp" and ".cpp" or ".c"
 	local fname = vim.fn.tempname() .. ext
 	local asm = vim.fn.tempname() .. ".s"
@@ -68,6 +136,7 @@ local function refresh()
 	local cmd = {
 		state.compiler,
 		"-S",
+		"-g",
 		"-masm=intel",
 		"-O" .. state.opt,
 		"-fno-asynchronous-unwind-tables",
@@ -81,6 +150,12 @@ local function refresh()
 		"-o",
 		asm,
 	}
+    if vim.fn.executable(state.compiler) ~= 1 then
+        os.remove(fname)
+        os.remove(asm)
+        write_output({ "Compiler not found: " .. state.compiler })
+        return
+    end
 	vim.system(cmd, { text = true, cwd = source_dir }, function(result)
 		vim.schedule(function()
 			if generation ~= state.generation then
@@ -97,7 +172,21 @@ local function refresh()
 				end
 			end
 			if content then
-				write_output(vim.split(content, "\n", { plain = true }))
+                if selection then
+                    local focused = relevant_assembly(content, selection.first, selection.last)
+                    if focused then
+                        write_output(readable_assembly(focused))
+                    else
+                        local all = vim.split(content, "\n", { plain = true })
+                        write_output(vim.list_extend({
+                            '# No function could be mapped to this selection.',
+                            '# Showing full assembly. Try selecting lines inside a function.',
+                            '',
+                        }, readable_assembly(all)))
+                    end
+                else
+                    write_output(readable_assembly(content))
+                end
 			else
 				write_output(
 					vim.split("Compilation failed:\n" .. (result.stderr or result.stdout or "Unknown error"), "\n")
@@ -115,6 +204,7 @@ local function schedule()
 	if state.timer then
 		state.timer:stop()
 		state.timer:close()
+        state.timer = nil
 	end
 	state.timer = vim.uv.new_timer()
 	state.timer:start(
@@ -125,26 +215,45 @@ local function schedule()
 				state.timer:close()
 				state.timer = nil
 			end
-			refresh()
+            if window_valid(state.win) and not state.selection then
+                refresh()
+            end
 		end)
 	)
 end
 local function close_window()
-	if window_valid(state.win) then
-		vim.api.nvim_win_close(state.win, true)
-	end
-	state.win = nil
+    state.generation = state.generation + 1 -- invalidate in-flight compilation
+    if state.timer then
+        state.timer:stop()
+        state.timer:close()
+        state.timer = nil
+    end
+    local source = state.source
+    if window_valid(state.win) then
+        vim.api.nvim_win_close(state.win, true)
+    end
+    state.win = nil
+    state.selection = nil
+    state.view_kind = nil
+    if valid(source) then
+        local source_win = vim.fn.bufwinid(source)
+        if source_win ~= -1 and window_valid(source_win) then
+            vim.api.nvim_set_current_win(source_win)
+        end
+    end
 end
-local function open_view(kind, source)
+local function open_view(kind, source, selection)
 	if state.win and window_valid(state.win) then
 		close_window()
 	end
 	state.source = source
+    state.selection = selection
+    state.view_kind = kind
 	local b = output_buffer()
 	if kind == "float" then
-		local width = math.max(30, math.floor(vim.o.columns * 0.72))
-		local height = math.max(8, math.floor(vim.o.lines * 0.75))
-		state.win = vim.api.nvim_open_win(b, false, {
+        local width = math.max(1, math.min(vim.o.columns - 4, math.floor(vim.o.columns * 0.72)))
+        local height = math.max(1, math.min(vim.o.lines - 5, math.floor(vim.o.lines * 0.75)))
+		state.win = vim.api.nvim_open_win(b, true, {
 			relative = "editor",
 			style = "minimal",
 			border = "rounded",
@@ -165,7 +274,8 @@ local function open_view(kind, source)
 	vim.wo[state.win].number = false
 	vim.wo[state.win].relativenumber = false
 	vim.wo[state.win].wrap = false
-	vim.keymap.set("n", "q", close_window, { buffer = b, silent = true })
+	vim.keymap.set("n", "q", close_window, { buffer = b, silent = true, desc = "Close assembly view" })
+    vim.keymap.set("n", "<Esc>", close_window, { buffer = b, silent = true, desc = "Close assembly view" })
 	refresh()
 end
 function M.toggle(kind)
@@ -188,12 +298,14 @@ function M.visual()
 	end
 	local first = vim.fn.getpos("'<")[2]
 	local last = vim.fn.getpos("'>")[2]
+    if first > last then
+        first, last = last, first
+    end
 	if first < 1 or last < first then
 		notify("Make a linewise selection", vim.log.levels.WARN)
 		return
 	end
-	state.selection = vim.api.nvim_buf_get_lines(b, first - 1, last, false)
-	open_view("split", b)
+    open_view("float", b, { first = first, last = last })
 end
 function M.build_asm()
 	local buf = vim.api.nvim_get_current_buf()
@@ -320,7 +432,7 @@ function M.setup()
 	})
 	vim.keymap.set("x", "<leader>la", function()
 		M.visual()
-	end, { desc = "Low-level: Assembly selection" })
+	end, { desc = "Low-level: Assembly for selected lines" })
 	vim.keymap.set("n", "<leader>lf", function()
 		M.toggle("float")
 	end, { desc = "Low-level: Assembly float" })
