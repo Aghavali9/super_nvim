@@ -307,3 +307,29 @@ Open an [issue](https://github.com/Aghavali9/super_nvim/issues) and include your
 ---
 
 **BAT-VIM** is a personal Neovim configuration. It is intended to be customized; review the included plugins and installer before running third-party code on your machine.
+
+## Linux / Windows assembly target
+
+In a C or C++ buffer, use `<leader>la` for the live split, `<leader>lf` for a
+floating view, and visual `<leader>la` for the containing functions. Toggle the
+**assembly output target** with `<leader>lt`; the target can also be set directly
+with `:AssemblyTarget linux` or `:AssemblyTarget windows`. The compiler toggle
+`<leader>lc` still switches GCC and Clang; `<leader>lo` changes optimization.
+When the assembly view is open, changing the target recompiles immediately.
+
+The Windows target means **x86-64 Windows PE/COFF using the MinGW-w64 ABI**,
+not merely Intel syntax on a Linux compiler. On Fedora, install the cross
+compiler packages providing `x86_64-w64-mingw32-gcc` and
+`x86_64-w64-mingw32-g++` (often `mingw64-gcc` and `mingw64-gcc-c++`).
+For a Linux target, use native `gcc`/`g++` or `clang`. If Clang is selected
+for Windows, the command uses `clang --target=x86_64-w64-windows-gnu`, which
+also requires a working MinGW-w64 sysroot, headers, and runtime. The viewer
+reports missing compilers and compilation errors rather than substituting
+Linux output. Windows-specific source may require additional include paths.
+
+`<leader>lb` builds saved `.s`/`.S` files using the selected target's GCC
+assembler driver; Windows executables receive a `.exe` extension, and the
+Linux-only `_start`/`-nostdlib` linking option is hidden for Windows. The
+native `<leader>r` C/C++ runner is separate; changing the assembly target
+**does not** run Windows PE executables on Linux (Wine or a Windows machine
+is needed), or make Windows/Linux source code automatically portable.
